@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasTable('leverancier_products')) {
+            return;
+        }
+
         Schema::create('leverancier_products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('leverancier_id')->constrained('leveranciers')->cascadeOnDelete();
