@@ -137,19 +137,17 @@
                                             <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
                                                 Wijzig klant
                                             </a>
-                                            @if ($isAanwezig)
-                                                <button type="button" class="btn btn-secondary btn-sm fw-semibold" disabled title="Deze klant is aanwezig en kan daarom niet verwijderd worden.">
-                                                    Niet verwijderbaar
+                                            <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger btn-sm fw-semibold"
+                                                    title="{{ $isAanwezig ? 'Klik om het unhappy scenario te tonen: verwijderen wordt geblokkeerd.' : 'Klik om klant te verwijderen.' }}"
+                                                >
+                                                    Verwijder klant
                                                 </button>
-                                            @else
-                                                <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold">
-                                                        Verwijder klant
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
