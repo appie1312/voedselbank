@@ -26,6 +26,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('voorraad') }}">Voorraad</a>
                     </li>
+                    {{-- Toon voedselpakketten voor alle rollen die ermee werken. --}}
+                    @if (auth()->user()->isDirectie() || auth()->user()->isMagazijnMedewerker() || auth()->user()->isVrijwilliger())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route(auth()->user()->role . '.voedselpakketten.index') }}">Voedselpakketten</a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard.redirect') }}">Dashboard</a>
                     </li>
