@@ -2,51 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use PDO;
+use Exception;
 
-/**
- * Model voor de tabel 'voorraad'.
- * Dit model haalt voorraadgegevens op uit de database.
- */
-class Voorraad extends Model
+class VoorraadModel
 {
-    // Laravel gebruikt standaard de meervoudsvorm,
-    // maar omdat jouw tabel precies 'voorraad' heet zetten we dit expliciet.
-    protected $table = 'voorraad';
+    private $db;
 
-    // Welke velden ingevuld mogen worden
-    protected $fillable = [
-        'product_id',
-        'hoeveelheid',
-        'minimum_voorraad',
-        'locatie',
-    ];
-
-    /**
-     * Relatie:
-     * Elke voorraadregel hoort bij 1 product.
-     */
-    public function product()
+    public function __construct($dbConnection)
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        $this->db = $dbConnection;
     }
 
     /**
-     * Bepaal de status van de voorraad.
-     * - Leeg als hoeveelheid 0 is
-     * - Aanvullen als hoeveelheid <= minimum voorraad
-     * - Voldoende in andere gevallen
+     * Haalt het volledige voorraadoverzicht op via een Stored Procedure.
+     * @return array|false
      */
-    public function getVoorraadStatusAttribute()
+    public function getVoorraadLijst()
     {
-        if ($this->hoeveelheid <= 0) {
-            return 'Leeg';
-        }
+        try {
+            $query = "CALL spGetVoorraadOverzicht()";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
 
-        if (!is_null($this->minimum_voorraad) && $this->hoeveelheid <= $this->minimum_voorraad) {
-            return 'Aanvullen';
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        } catch (Exception $e) {
+            // Technische log
+            error_log("Fout in VoorraadModel::getVoorraadLijst: " . $e->getMessage());
+            return false;
         }
-
-        return 'Voldoende';
     }
 }
