@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1>Leveranciers</h1>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="mb-0">Leveranciers</h1>
+        <a href="{{ route('leveranciers.create') }}" class="btn btn-primary">Nieuwe leverancier</a>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -24,6 +27,7 @@
                     <th>Email Contactpersoon</th>
                     <th>Volgende levering</th>
                     <th>Producten</th>
+                    <th>Acties</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,16 +51,22 @@
                                 -
                             @endif
                         </td>
+                        <td>
+                            <form method="POST" action="{{ route('leveranciers.destroy', $leverancier->id) }}" onsubmit="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">Verwijderen</button>
+                            </form>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center">Geen leveranciers gevonden.</td>
+                        <td colspan="9" class="text-center">Geen leveranciers gevonden.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- <a href="{{ route('leveranciers.create') }}" class="btn btn-primary mt-3">Nieuwe leverancier toevoegen</a> --}}
 </div>
 @endsection

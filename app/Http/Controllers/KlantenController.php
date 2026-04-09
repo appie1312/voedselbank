@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\KlantOverzichtRequest;
 use App\Http\Requests\KlantToevoegenRequest;
+use App\Http\Requests\KlantWijzigenRequest;
 use App\Models\Klant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
@@ -55,6 +56,81 @@ class KlantenController extends Controller
             return back()
                 ->withInput()
                 ->with('status_error', 'Er is een storing. De klant kon niet worden toegevoegd.');
+        }
+    }
+
+    public function edit(int $klantId): View|RedirectResponse
+    {
+        try {
+            $klant = Klant::haalKlantVoorWijzigen($klantId);
+
+            if (! $klant) {
+                return redirect()
+                    ->route('klanten.index')
+                    ->with('status_error', 'Deze klant kon niet worden gevonden.');
+            }
+
+            return view('klanten.edit', [
+                'klant' => $klant,
+            ]);
+        } catch (Throwable $exception) {
+            Log::error('Technische log: formulier voor klant wijzigen laden mislukt.', [
+                'user_id' => auth()->id(),
+                'klant_id' => $klantId,
+                'error_class' => $exception::class,
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('klanten.index')
+                ->with('status_error', 'Er is een storing. Het wijzigformulier kon niet worden geladen.');
+        }
+    }
+
+    public function update(KlantWijzigenRequest $request, int $klantId): RedirectResponse
+    {
+        try {
+            $klantData = $request->validated();
+            $resultaat = Klant::wijzigViaStoredProcedure($klantId, $klantData);
+
+            if (! $resultaat['klant_bestaat']) {
+                return redirect()
+                    ->route('klanten.index')
+                    ->with('status_error', 'Deze klant kon niet worden gevonden.');
+            }
+
+            if ($resultaat['bestaat_email_al']) {
+                Log::warning('Technische log: klant wijzigen geblokkeerd door bestaand e-mailadres.', [
+                    'user_id' => $request->user()?->id,
+                    'klant_id' => $klantId,
+                    'email_nieuw' => $klantData['emailadres'] ?? null,
+                ]);
+
+                return back()
+                    ->withInput()
+                    ->with('status_error', 'De klantgegevens kunnen niet worden gewijzigd, want deze email bestaat al');
+            }
+
+            Log::info('Technische log: klant succesvol gewijzigd.', [
+                'user_id' => $request->user()?->id,
+                'klant_id' => $klantId,
+                'gezinsnaam_nieuw' => $klantData['gezinsnaam'],
+            ]);
+
+            return redirect()
+                ->route('klanten.index')
+                ->with('status_success', 'De klantgegevens zijn succesvol gewijzigd');
+        } catch (Throwable $exception) {
+            Log::error('Technische log: klant wijzigen mislukt.', [
+                'user_id' => $request->user()?->id,
+                'klant_id' => $klantId,
+                'error_class' => $exception::class,
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('status_error', 'Er is een storing. De klantgegevens konden niet worden gewijzigd.');
         }
     }
 
