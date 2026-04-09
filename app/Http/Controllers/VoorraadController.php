@@ -10,7 +10,7 @@ class VoorraadController extends Controller
     public function index()
     {
         try {
-            $voorraad = DB::table('voorraad as v')
+            $voorraad = DB::table('voorraden as v')
                 ->join('products as p', 'v.product_id', '=', 'p.id')
                 ->join('categories as c', 'p.categorie_id', '=', 'c.id')
                 ->select(
@@ -26,6 +26,7 @@ class VoorraadController extends Controller
                         END as status
                     ")
                 )
+                ->orderBy('p.naam')
                 ->get();
 
             $melding = '';
@@ -34,10 +35,7 @@ class VoorraadController extends Controller
                 $melding = 'Er is momenteel geen voorraad beschikbaar.';
             }
 
-            return view('voorraad.index', [
-                'voorraad' => $voorraad,
-                'melding' => $melding,
-            ]);
+            return view('voorraad.index', compact('voorraad', 'melding'));
         } catch (Exception $e) {
             logger()->error('Fout in VoorraadController: ' . $e->getMessage());
 
@@ -48,5 +46,3 @@ class VoorraadController extends Controller
         }
     }
 }
-
-

@@ -13,18 +13,12 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Eerst voorraad leegmaken, daarna products, daarna categories
-        // vanwege foreign key relaties.
-        DB::table('voorraad')->delete();
+        DB::table('voorraden')->delete();
         DB::table('products')->delete();
         DB::table('categories')->delete();
 
-        // Categorieën toevoegen
         DB::table('categories')->insert([
             [
                 'id' => 1,
@@ -100,7 +94,6 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // Producten toevoegen
         DB::table('products')->insert([
             [
                 'id' => 1,
@@ -144,8 +137,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // Voorraad toevoegen
-        DB::table('voorraad')->insert([
+        DB::table('voorraden')->insert([
             [
                 'product_id' => 1,
                 'hoeveelheid' => 20,
@@ -180,12 +172,6 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // Eventuele business seeder
-        if (class_exists(\Database\Seeders\CoreBusinessSeeder::class)) {
-            $this->call(CoreBusinessSeeder::class);
-        }
-
-        // Demo gebruikers
         $gebruikers = [
             [
                 'name' => 'Directie Demo',

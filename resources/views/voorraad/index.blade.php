@@ -2,56 +2,37 @@
 
 @section('content')
 <div class="container">
-    <h1>Voorraadoverzicht</h1>
-<!-- resources/views/voorraad/index.blade.php -->
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <title>Voorraadoverzicht - Voedselbank Maaskantje</title>
-    <style>
-        .alert { padding: 15px; background-color: #f8d7da; color: #721c24; margin-bottom: 20px; }
-        .warning { background-color: #fff3cd; color: #856404; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-    </style>
-</head>
-<body>
+    <h1 class="mb-4">Voorraadoverzicht</h1>
 
-
-    {{-- Feedback melding aan eindgebruiker --}}
     @if (!empty($melding))
-        <div class="alert">
-            <p><strong>Melding:</strong> {{ $melding }}</p>
+        <div style="padding: 15px; background-color: #f8d7da; color: #721c24; margin-bottom: 20px; border-radius: 6px;">
+            <strong>Melding:</strong> {{ $melding }}
         </div>
     @endif
 
     @if (count($voorraad) > 0)
-        <table>
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Categorie</th>
-                    <th>Aantal</th>
-                    <th>Locatie</th>
-                    <th>Status</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Product</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Categorie</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Aantal</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Locatie</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($voorraad as $item)
-                    <tr class="{{ $item->status == 'Aanvullen' ? 'warning' : '' }}">
-                        <td>{{ $item->product_naam }}</td>
-                        <td>{{ $item->categorie_naam }}</td>
-                        <td>{{ $item->hoeveelheid }}</td>
-                        <td>{{ $item->locatie }}</td>
-                        <td>{{ $item->status }}</td>
+                    <tr style="{{ $item->status === 'Leeg' ? 'background-color:#f8d7da;' : ($item->status === 'Aanvullen' ? 'background-color:#fff3cd;' : '') }}">
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ $item->product_naam }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ $item->categorie_naam }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ $item->hoeveelheid }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ $item->locatie ?? '-' }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">{{ $item->status }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     @endif
-
-</body>
-</html>
-
+</div>
 @endsection

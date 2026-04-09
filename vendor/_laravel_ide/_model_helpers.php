@@ -5,24 +5,6 @@ namespace App\Models {
     /**
      * App\Models\Account
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $remember_token
-     * @property string $password
-     * @property string|null $email_verified_at
-     * @property string $role
-     * @property string $email
-     * @property string $name
-     * @property int $id
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereRole($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereEmailVerifiedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account wherePassword($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereRememberToken($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Account>|Account query()
@@ -345,27 +327,9 @@ namespace App\Models {
     /**
      * App\Models\User
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $remember_token
-     * @property string $password
-     * @property \Illuminate\Support\Carbon|null $email_verified_at
-     * @property string $role
-     * @property string $email
-     * @property string $name
-     * @property int $id
      * @property-read \App\Models\UserProfile $profile
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
      * @property-read int|null $notifications_count
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereRole($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereEmailVerifiedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User wherePassword($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereRememberToken($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User query()
@@ -688,27 +652,7 @@ namespace App\Models {
     /**
      * App\Models\UserProfile
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $bio
-     * @property string|null $verantwoordelijkheden
-     * @property string|null $beschikbaarheid
-     * @property string|null $afdeling
-     * @property string|null $adres
-     * @property string|null $telefoon
-     * @property int $user_id
-     * @property int $id
      * @property-read \App\Models\User $user
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereUserId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereTelefoon($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereAdres($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereAfdeling($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereBeschikbaarheid($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereVerantwoordelijkheden($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereBio($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<UserProfile>|UserProfile query()
