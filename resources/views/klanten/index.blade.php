@@ -17,10 +17,6 @@
                 <a href="{{ route('klanten.create') }}" class="btn btn-success">Klant toevoegen</a>
             </div>
 
-            <div class="alert alert-info py-2 mb-3" role="alert">
-                Alleen klanten met status <strong>Afwezig</strong> of <strong>Buiten land</strong> kunnen worden verwijderd.
-            </div>
-
             <form method="GET" action="{{ route('klanten.index') }}" class="row g-3 needs-validation" novalidate>
                 <div class="col-12 col-lg-6">
                     <label for="zoekterm" class="form-label">Zoekterm</label>
