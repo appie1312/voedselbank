@@ -15,29 +15,35 @@ class VoorraadSeeder extends Seeder
         }
 
         $now = now();
+        // Voor elk product een basisvoorraadregel aanmaken.
+        $producten = DB::table('products as p')
+            ->join('categories as c', 'c.id', '=', 'p.categorie_id')
+            ->select([
+                'p.id',
+                'p.aantal_in_voorraad',
+                'c.naam as categorie_naam',
+            ])
+            ->get();
 
-        $voorraadItems = [
-            ['ean_nummer' => '8710400000001', 'hoeveelheid' => 20, 'minimum_voorraad' => 10, 'locatie' => 'Stelling A'],
-            ['ean_nummer' => '8710400000002', 'hoeveelheid' => 5, 'minimum_voorraad' => 10, 'locatie' => 'Koeling 1'],
-            ['ean_nummer' => '8710400000003', 'hoeveelheid' => 30, 'minimum_voorraad' => 8, 'locatie' => 'Zuivel rek'],
-            ['ean_nummer' => '8710400000004', 'hoeveelheid' => 12, 'minimum_voorraad' => 6, 'locatie' => 'Broodrek'],
-        ];
+        foreach ($producten as $product) {
+            // Simpele defaults: genoeg om te testen, maar met realistische minima.
+            $hoeveelheid = max(5, min(80, (int) $product->aantal_in_voorraad));
+            $minimumVoorraad = max(3, (int) ceil($hoeveelheid * 0.25));
 
-        foreach ($voorraadItems as $item) {
-            $productId = DB::table('products')
-                ->where('ean_nummer', $item['ean_nummer'])
-                ->value('id');
-
-            if (! $productId) {
-                continue;
-            }
+            $locatie = match ($product->categorie_naam) {
+                'Zuivel, plantaardig en eieren' => 'Koeling 1',
+                'Bakkerij en banket' => 'Broodrek',
+                'Baby, verzorging en hygiëne' => 'Stelling C',
+                'Kaas, vleeswaren' => 'Koeling 2',
+                default => 'Stelling A',
+            };
 
             DB::table('voorraad')->updateOrInsert(
-                ['product_id' => $productId],
+                ['product_id' => (int) $product->id],
                 [
-                    'hoeveelheid' => $item['hoeveelheid'],
-                    'minimum_voorraad' => $item['minimum_voorraad'],
-                    'locatie' => $item['locatie'],
+                    'hoeveelheid' => $hoeveelheid,
+                    'minimum_voorraad' => $minimumVoorraad,
+                    'locatie' => $locatie,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]

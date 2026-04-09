@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
         // -------------------------------------------------------
         // SP: Alle leveranciers ophalen
         // -------------------------------------------------------
@@ -112,8 +115,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_get_all_leveranciers');
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_check_leverancier_naam');
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_create_leverancier');
     }
 };
+

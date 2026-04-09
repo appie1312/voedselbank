@@ -7,6 +7,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
         DB::unprepared('DROP PROCEDURE IF EXISTS spGetVoorraadOverzicht');
 
         DB::unprepared(<<<'SQL'
@@ -32,7 +35,11 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
         DB::unprepared('DROP PROCEDURE IF EXISTS spGetVoorraadOverzicht');
     }
 };
+
 
