@@ -1,4 +1,3 @@
--- Verwijder oude procedure als die bestaat
 DROP PROCEDURE IF EXISTS spGetVoorraadOverzicht;
 
 DELIMITER $$
