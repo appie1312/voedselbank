@@ -24,9 +24,6 @@
                         <a class="nav-link" href="<?php echo e(route('leveranciers.index')); ?>">Leveranciers</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo e(route('voorraad')); ?>">Voorraad</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="<?php echo e(route('dashboard.redirect')); ?>">Dashboard</a>
                     </li>
                     <li class="nav-item">
