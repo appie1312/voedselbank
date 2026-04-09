@@ -17,6 +17,10 @@
                 <a href="{{ route('klanten.create') }}" class="btn btn-success">Klant toevoegen</a>
             </div>
 
+            <div class="alert alert-info py-2 mb-3" role="alert">
+                Alleen klanten met status <strong>Afwezig</strong> of <strong>Buiten land</strong> kunnen worden verwijderd.
+            </div>
+
             <form method="GET" action="{{ route('klanten.index') }}" class="row g-3 needs-validation" novalidate>
                 <div class="col-12 col-lg-6">
                     <label for="zoekterm" class="form-label">Zoekterm</label>
@@ -110,12 +114,25 @@
                             @endfor
                         @else
                             @foreach ($klanten as $klant)
+                                @php
+                                    $statusWaarde = (string) ($klant->aanwezigheidsstatus ?? '');
+                                    $isAanwezig = $statusWaarde === 'binnen_land';
+                                    $statusLabel = match ($statusWaarde) {
+                                        'binnen_land' => 'Aanwezig (binnen land)',
+                                        'buiten_land' => 'Afwezig (buiten land)',
+                                        'afwezig' => 'Afwezig',
+                                        default => 'Onbekend',
+                                    };
+                                    $statusBadgeClass = $isAanwezig ? 'bg-warning text-dark' : 'bg-success';
+                                @endphp
                                 <tr>
                                     <td>{{ $klant->gezinsnaam }}</td>
                                     <td>{{ $klant->adres }}</td>
                                     <td>{{ $klant->telefoonnummer }}</td>
                                     <td>{{ $klant->emailadres ?: '-' }}</td>
-                                    <td>{{ str_replace('_', ' ', ucfirst((string) ($klant->aanwezigheidsstatus ?? 'onbekend'))) }}</td>
+                                    <td>
+                                        <span class="badge {{ $statusBadgeClass }}">{{ $statusLabel }}</span>
+                                    </td>
                                     <td>{{ (int) $klant->aantal_volwassenen }}</td>
                                     <td>{{ (int) $klant->aantal_kinderen }}</td>
                                     <td>{{ (int) $klant->aantal_babys }}</td>
@@ -124,13 +141,19 @@
                                             <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
                                                 Wijzig klant
                                             </a>
-                                            <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm fw-semibold">
-                                                    Verwijder klant
+                                            @if ($isAanwezig)
+                                                <button type="button" class="btn btn-secondary btn-sm fw-semibold" disabled title="Deze klant is aanwezig en kan daarom niet verwijderd worden.">
+                                                    Niet verwijderbaar
                                                 </button>
-                                            </form>
+                                            @else
+                                                <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm fw-semibold">
+                                                        Verwijder klant
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
