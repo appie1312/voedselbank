@@ -16,6 +16,7 @@ class Klant extends Model
         'adres',
         'telefoonnummer',
         'emailadres',
+        'aanwezigheidsstatus',
         'aantal_volwassenen',
         'aantal_kinderen',
         'aantal_babys',
@@ -32,6 +33,7 @@ class Klant extends Model
             trim((string) $attributes['adres']),
             trim((string) $attributes['telefoonnummer']),
             ($attributes['emailadres'] ?? null) === null ? null : trim((string) $attributes['emailadres']),
+            trim((string) $attributes['aanwezigheidsstatus']),
             (int) $attributes['aantal_volwassenen'],
             (int) $attributes['aantal_kinderen'],
             (int) $attributes['aantal_babys'],
@@ -39,7 +41,7 @@ class Klant extends Model
 
         try {
             $resultaat = DB::select(
-                'CALL sp_klant_toevoegen(?, ?, ?, ?, ?, ?, ?)',
+                'CALL sp_klant_toevoegen(?, ?, ?, ?, ?, ?, ?, ?)',
                 $payload
             );
         } catch (QueryException $exception) {
@@ -72,6 +74,7 @@ class Klant extends Model
                 'k.adres',
                 'k.telefoonnummer',
                 'k.emailadres',
+                'k.aanwezigheidsstatus',
                 'k.aantal_volwassenen',
                 'k.aantal_kinderen',
                 'k.aantal_babys',
@@ -82,6 +85,7 @@ class Klant extends Model
                 'k.adres',
                 'k.telefoonnummer',
                 'k.emailadres',
+                'k.aanwezigheidsstatus',
                 'k.aantal_volwassenen',
                 'k.aantal_kinderen',
                 'k.aantal_babys',
@@ -103,6 +107,7 @@ class Klant extends Model
             trim((string) $attributes['adres']),
             trim((string) $attributes['telefoonnummer']),
             ($attributes['emailadres'] ?? null) === null ? null : trim((string) $attributes['emailadres']),
+            trim((string) $attributes['aanwezigheidsstatus']),
             (int) $attributes['aantal_volwassenen'],
             (int) $attributes['aantal_kinderen'],
             (int) $attributes['aantal_babys'],
@@ -110,7 +115,7 @@ class Klant extends Model
 
         try {
             $resultaat = DB::select(
-                'CALL sp_klant_wijzigen(?, ?, ?, ?, ?, ?, ?, ?)',
+                'CALL sp_klant_wijzigen(?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 $payload
             );
         } catch (QueryException $exception) {
@@ -152,6 +157,30 @@ class Klant extends Model
         return collect($resultaten);
     }
 
+    /**
+     * @return array{verwijderd: bool, aanwezig: bool, klant_bestaat: bool}
+     */
+    public static function verwijderViaStoredProcedure(int $klantId): array
+    {
+        try {
+            $resultaat = DB::select('CALL sp_klant_verwijderen(?)', [$klantId]);
+        } catch (QueryException $exception) {
+            if (! str_contains(strtolower($exception->getMessage()), 'sp_klant_verwijderen')) {
+                throw $exception;
+            }
+
+            return self::verwijderViaQuery($klantId);
+        }
+
+        $eersteRij = $resultaat[0] ?? null;
+
+        return [
+            'verwijderd' => ((int) ($eersteRij->verwijderd ?? 0)) === 1,
+            'aanwezig' => ((int) ($eersteRij->aanwezig ?? 0)) === 1,
+            'klant_bestaat' => ((int) ($eersteRij->klant_bestaat ?? 0)) === 1,
+        ];
+    }
+
     private static function haalOverzichtViaJoinQuery(string $zoekterm, int $aantalRijen): Collection
     {
         return DB::table('klanten as k')
@@ -172,6 +201,7 @@ class Klant extends Model
                 'k.adres',
                 'k.telefoonnummer',
                 'k.emailadres',
+                'k.aanwezigheidsstatus',
                 'k.aantal_volwassenen',
                 'k.aantal_kinderen',
                 'k.aantal_babys',
@@ -184,6 +214,7 @@ class Klant extends Model
                 'k.adres',
                 'k.telefoonnummer',
                 'k.emailadres',
+                'k.aanwezigheidsstatus',
                 'k.aantal_volwassenen',
                 'k.aantal_kinderen',
                 'k.aantal_babys',
@@ -229,6 +260,7 @@ class Klant extends Model
             'adres' => trim((string) $attributes['adres']),
             'telefoonnummer' => trim((string) $attributes['telefoonnummer']),
             'emailadres' => $emailadres === '' ? null : $emailadres,
+            'aanwezigheidsstatus' => trim((string) $attributes['aanwezigheidsstatus']),
             'aantal_volwassenen' => (int) $attributes['aantal_volwassenen'],
             'aantal_kinderen' => (int) $attributes['aantal_kinderen'],
             'aantal_babys' => (int) $attributes['aantal_babys'],
@@ -284,6 +316,7 @@ class Klant extends Model
                 'adres' => trim((string) $attributes['adres']),
                 'telefoonnummer' => trim((string) $attributes['telefoonnummer']),
                 'emailadres' => $emailadres === '' ? null : $emailadres,
+                'aanwezigheidsstatus' => trim((string) $attributes['aanwezigheidsstatus']),
                 'aantal_volwassenen' => (int) $attributes['aantal_volwassenen'],
                 'aantal_kinderen' => (int) $attributes['aantal_kinderen'],
                 'aantal_babys' => (int) $attributes['aantal_babys'],
@@ -293,6 +326,53 @@ class Klant extends Model
         return [
             'gewijzigd' => true,
             'bestaat_email_al' => false,
+            'klant_bestaat' => true,
+        ];
+    }
+
+    /**
+     * @return array{verwijderd: bool, aanwezig: bool, klant_bestaat: bool}
+     */
+    private static function verwijderViaQuery(int $klantId): array
+    {
+        $klant = DB::table('klanten')
+            ->where('id', $klantId)
+            ->select(['id', 'aanwezigheidsstatus'])
+            ->first();
+
+        if (! $klant) {
+            return [
+                'verwijderd' => false,
+                'aanwezig' => false,
+                'klant_bestaat' => false,
+            ];
+        }
+
+        if ($klant->aanwezigheidsstatus === 'binnen_land') {
+            return [
+                'verwijderd' => false,
+                'aanwezig' => true,
+                'klant_bestaat' => true,
+            ];
+        }
+
+        DB::transaction(function () use ($klantId): void {
+            // Eerst pakketregels verwijderen, daarna pakketten en klant.
+            DB::statement(
+                'DELETE pp FROM pakket_product pp
+                 INNER JOIN voedselpakketten vp ON vp.id = pp.pakket_id
+                 WHERE vp.klant_id = ?',
+                [$klantId]
+            );
+
+            DB::table('voedselpakketten')->where('klant_id', $klantId)->delete();
+            DB::table('klant_wens')->where('klant_id', $klantId)->delete();
+            DB::table('klanten')->where('id', $klantId)->delete();
+        });
+
+        return [
+            'verwijderd' => true,
+            'aanwezig' => false,
             'klant_bestaat' => true,
         ];
     }

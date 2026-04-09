@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
         Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
         Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
+        Route::delete('/directie/klanten/{klantId}', [KlantenController::class, 'destroy'])->name('klanten.destroy');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
         });
 

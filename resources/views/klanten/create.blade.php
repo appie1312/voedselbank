@@ -70,6 +70,16 @@
                     <div class="invalid-feedback">Vul een geldig e-mailadres in.</div>
                 </div>
 
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="aanwezigheidsstatus" class="form-label">Aanwezigheidsstatus</label>
+                    <select id="aanwezigheidsstatus" name="aanwezigheidsstatus" class="form-select" required>
+                        <option value="binnen_land" @selected(old('aanwezigheidsstatus', 'binnen_land') === 'binnen_land')>Binnen land</option>
+                        <option value="buiten_land" @selected(old('aanwezigheidsstatus') === 'buiten_land')>Buiten land</option>
+                        <option value="afwezig" @selected(old('aanwezigheidsstatus') === 'afwezig')>Afwezig</option>
+                    </select>
+                    <div class="invalid-feedback">Kies een status.</div>
+                </div>
+
                 <div class="col-12 col-md-4 col-lg-4">
                     <label for="aantal_volwassenen" class="form-label">Aantal Volwassen</label>
                     <input
