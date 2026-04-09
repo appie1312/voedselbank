@@ -69,12 +69,13 @@
                             <th>Aantal Volwassen</th>
                             <th>Aantal Kinderen</th>
                             <th>Aantal Baby</th>
+                            <th>Actie</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (isset($status_error))
                             <tr>
-                                <td colspan="7">Door een storing kunnen klanten nu niet worden weergegeven.</td>
+                                <td colspan="8">Door een storing kunnen klanten nu niet worden weergegeven.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
@@ -85,11 +86,12 @@
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                 </tr>
                             @endfor
                         @elseif ($klanten->isEmpty())
                             <tr>
-                                <td colspan="7">Geen klanten gevonden.</td>
+                                <td colspan="8">Geen klanten gevonden.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
@@ -100,6 +102,7 @@
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                 </tr>
                             @endfor
                         @else
@@ -112,6 +115,11 @@
                                     <td>{{ (int) $klant->aantal_volwassenen }}</td>
                                     <td>{{ (int) $klant->aantal_kinderen }}</td>
                                     <td>{{ (int) $klant->aantal_babys }}</td>
+                                    <td>
+                                        <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
+                                            Wijzig klant
+                                        </a>
+                                    </td>
                                 </tr>
                             @endforeach
 
@@ -124,6 +132,7 @@
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                 </tr>
                             @endfor
                         @endif
