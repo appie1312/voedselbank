@@ -1,12 +1,15 @@
--- Stored Procedure: klant wijzigen
--- Uitvoeren in MySQL Workbench op database `voedselbank_maaskantje`
+<?php
 
-USE voedselbank_maaskantje;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
-DROP PROCEDURE IF EXISTS sp_klant_wijzigen;
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klant_wijzigen');
 
-DELIMITER $$
-
+        DB::unprepared(<<<'SQL'
 CREATE PROCEDURE sp_klant_wijzigen (
     IN p_klant_id BIGINT UNSIGNED,
     IN p_gezinsnaam VARCHAR(100),
@@ -57,9 +60,12 @@ BEGIN
             SELECT 1 AS gewijzigd, 0 AS bestaat_email_al, 1 AS klant_bestaat;
         END IF;
     END IF;
-END $$
+END
+SQL);
+    }
 
-DELIMITER ;
-
--- Test:
--- CALL sp_klant_wijzigen(1, 'Familie Jansen', 'Dorpsstraat 1', '0612345678', 'jansen@voorbeeld.nl', 'binnen_land', 2, 1, 0);
+    public function down(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klant_wijzigen');
+    }
+};

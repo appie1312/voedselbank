@@ -66,6 +66,7 @@
                             <th>Adres</th>
                             <th>Telefoonnummer</th>
                             <th>E-mailadres</th>
+                            <th>Status</th>
                             <th>Aantal Volwassen</th>
                             <th>Aantal Kinderen</th>
                             <th>Aantal Baby</th>
@@ -75,10 +76,11 @@
                     <tbody>
                         @if (isset($status_error))
                             <tr>
-                                <td colspan="8">Door een storing kunnen klanten nu niet worden weergegeven.</td>
+                                <td colspan="9">Door een storing kunnen klanten nu niet worden weergegeven.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
@@ -91,10 +93,11 @@
                             @endfor
                         @elseif ($klanten->isEmpty())
                             <tr>
-                                <td colspan="8">Geen klanten gevonden.</td>
+                                <td colspan="9">Geen klanten gevonden.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
@@ -107,24 +110,52 @@
                             @endfor
                         @else
                             @foreach ($klanten as $klant)
+                                @php
+                                    $statusWaarde = (string) ($klant->aanwezigheidsstatus ?? '');
+                                    $isAanwezig = $statusWaarde === 'binnen_land';
+                                    $statusLabel = match ($statusWaarde) {
+                                        'binnen_land' => 'Aanwezig (binnen land)',
+                                        'buiten_land' => 'Afwezig (buiten land)',
+                                        'afwezig' => 'Afwezig',
+                                        default => 'Onbekend',
+                                    };
+                                    $statusBadgeClass = $isAanwezig ? 'bg-warning text-dark' : 'bg-success';
+                                @endphp
                                 <tr>
                                     <td>{{ $klant->gezinsnaam }}</td>
                                     <td>{{ $klant->adres }}</td>
                                     <td>{{ $klant->telefoonnummer }}</td>
                                     <td>{{ $klant->emailadres ?: '-' }}</td>
+                                    <td>
+                                        <span class="badge {{ $statusBadgeClass }}">{{ $statusLabel }}</span>
+                                    </td>
                                     <td>{{ (int) $klant->aantal_volwassenen }}</td>
                                     <td>{{ (int) $klant->aantal_kinderen }}</td>
                                     <td>{{ (int) $klant->aantal_babys }}</td>
                                     <td>
-                                        <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
-                                            Wijzig klant
-                                        </a>
+                                        <div class="d-flex flex-column flex-lg-row gap-1">
+                                            <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
+                                                Wijzig klant
+                                            </a>
+                                            <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger btn-sm fw-semibold"
+                                                    title="{{ $isAanwezig ? 'Klik om het unhappy scenario te tonen: verwijderen wordt geblokkeerd.' : 'Klik om klant te verwijderen.' }}"
+                                                >
+                                                    Verwijder klant
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
 
                             @for ($index = 0; $index < $legeRijen; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
