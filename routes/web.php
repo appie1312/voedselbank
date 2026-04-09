@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
@@ -24,6 +26,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/leveranciers', [LeverancierController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('leveranciers.index');
+    Route::get('/voorraad', [VoorraadController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('voorraad');
     Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
         ->middleware('role:directie,magazijn_medewerker')
         ->name('leveranciers.create');
