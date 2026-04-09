@@ -152,6 +152,10 @@ CREATE TABLE IF NOT EXISTS klanten (
     adres VARCHAR(255) NOT NULL,
     telefoonnummer VARCHAR(20) NOT NULL,
     emailadres VARCHAR(150) NULL,
+<<<<<<< HEAD
+    allergieen TEXT NULL,
+=======
+>>>>>>> 49b7a9e1d147f3414d7c2a98dea1b09a3d7ceca6
     aantal_volwassenen INT NOT NULL DEFAULT 0,
     aantal_kinderen INT NOT NULL DEFAULT 0,
     aantal_babys INT NOT NULL DEFAULT 0,
@@ -159,6 +163,12 @@ CREATE TABLE IF NOT EXISTS klanten (
     updated_at TIMESTAMP NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+<<<<<<< HEAD
+ALTER TABLE klanten
+    ADD COLUMN IF NOT EXISTS allergieen TEXT NULL AFTER emailadres;
+
+=======
+>>>>>>> 49b7a9e1d147f3414d7c2a98dea1b09a3d7ceca6
 CREATE TABLE IF NOT EXISTS wens_allergies (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     beschrijving VARCHAR(100) NOT NULL UNIQUE,
