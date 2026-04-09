@@ -1,29 +1,35 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Controllers;
 
-use App\Models\Voorraad;
+use App\Models\VoorraadModel;
 
-/**
- * Controller voor het tonen van het voorraadoverzicht.
- */
-class VoorraadController extends Controller
+class VoorraadController
 {
+    private $voorraadModel;
+
+    public function __construct($db)
+    {
+        $this->voorraadModel = new VoorraadModel($db);
+    }
+
     /**
-     * Toon een overzicht van alle voorraadregels.
-     *
-     * Acceptatiecriteria:
-     * - Als er voorraad is: toon lijst met producten en hun voorraadstatus
-     * - Als er geen voorraad is: toon melding
+     * Rendert de voorraad pagina
      */
     public function index()
     {
-        // Haal voorraad op inclusief product en categorie
-        $voorraadItems = Voorraad::with(['product.categorie'])
-            ->orderBy('id', 'asc')
-            ->get();
+        $voorraad = $this->voorraadModel->getVoorraadLijst();
+        $melding = "";
 
-        // Geef de data door aan de view
-        return view('voorraad.index', compact('voorraadItems'));
+        // Validatie van data-ontvangst en bepalen van feedback meldingen
+        if ($voorraad === false) {
+            $melding = "Er is een technische fout opgetreden bij het laden van de voorraad.";
+            $voorraad = [];
+        } elseif (empty($voorraad)) {
+            $melding = "Er is momenteel geen voorraad beschikbaar.";
+        }
+
+        // View laden (data wordt meegegeven)
+        require_once '../app/views/voorraad/index.php';
     }
 }
