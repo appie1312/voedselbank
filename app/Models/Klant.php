@@ -21,6 +21,44 @@ class Klant extends Model
         'aantal_babys',
     ];
 
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array{toegevoegd: bool, bestaat_al: bool, klant_id: int|null}
+     */
+    public static function voegToeViaStoredProcedure(array $attributes): array
+    {
+        $payload = [
+            trim((string) $attributes['gezinsnaam']),
+            trim((string) $attributes['adres']),
+            trim((string) $attributes['telefoonnummer']),
+            ($attributes['emailadres'] ?? null) === null ? null : trim((string) $attributes['emailadres']),
+            (int) $attributes['aantal_volwassenen'],
+            (int) $attributes['aantal_kinderen'],
+            (int) $attributes['aantal_babys'],
+        ];
+
+        try {
+            $resultaat = DB::select(
+                'CALL sp_klant_toevoegen(?, ?, ?, ?, ?, ?, ?)',
+                $payload
+            );
+        } catch (QueryException $exception) {
+            if (! str_contains(strtolower($exception->getMessage()), 'sp_klant_toevoegen')) {
+                throw $exception;
+            }
+
+            return self::voegToeViaQuery($attributes);
+        }
+
+        $eersteRij = $resultaat[0] ?? null;
+
+        return [
+            'toegevoegd' => ((int) ($eersteRij->toegevoegd ?? 0)) === 1,
+            'bestaat_al' => ((int) ($eersteRij->bestaat_al ?? 0)) === 1,
+            'klant_id' => isset($eersteRij->klant_id) ? (int) $eersteRij->klant_id : null,
+        ];
+    }
+
     public static function haalOverzichtViaStoredProcedure(?string $zoekterm, int $aantalRijen): Collection
     {
         $veiligeZoekterm = trim((string) $zoekterm);
@@ -82,5 +120,55 @@ class Klant extends Model
                 DB::raw("GROUP_CONCAT(DISTINCT wa.beschrijving ORDER BY wa.beschrijving SEPARATOR ', ') AS wensen_allergieen"),
             ])
             ->get();
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array{toegevoegd: bool, bestaat_al: bool, klant_id: int|null}
+     */
+    private static function voegToeViaQuery(array $attributes): array
+    {
+        $emailadres = trim((string) ($attributes['emailadres'] ?? ''));
+
+        $bestaatAl = DB::table('klanten')
+            ->where(function ($query) use ($attributes, $emailadres): void {
+                if ($emailadres !== '') {
+                    $query->orWhere('emailadres', $emailadres);
+                }
+
+                $query->orWhere(function ($subQuery) use ($attributes): void {
+                    $subQuery
+                        ->where('gezinsnaam', trim((string) $attributes['gezinsnaam']))
+                        ->where('adres', trim((string) $attributes['adres']))
+                        ->where('telefoonnummer', trim((string) $attributes['telefoonnummer']));
+                });
+            })
+            ->exists();
+
+        if ($bestaatAl) {
+            return [
+                'toegevoegd' => false,
+                'bestaat_al' => true,
+                'klant_id' => null,
+            ];
+        }
+
+        $klantId = (int) DB::table('klanten')->insertGetId([
+            'gezinsnaam' => trim((string) $attributes['gezinsnaam']),
+            'adres' => trim((string) $attributes['adres']),
+            'telefoonnummer' => trim((string) $attributes['telefoonnummer']),
+            'emailadres' => $emailadres === '' ? null : $emailadres,
+            'aantal_volwassenen' => (int) $attributes['aantal_volwassenen'],
+            'aantal_kinderen' => (int) $attributes['aantal_kinderen'],
+            'aantal_babys' => (int) $attributes['aantal_babys'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            'toegevoegd' => true,
+            'bestaat_al' => false,
+            'klant_id' => $klantId,
+        ];
     }
 }

@@ -24,6 +24,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/uitloggen', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'redirectByRole'])->name('dashboard.redirect');
+    Route::get('/leveranciers', [LeverancierController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('leveranciers.index');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
@@ -31,12 +34,15 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
         Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
+        Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
+        Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
+        Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
         Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
         Route::get('/magazijn/dashboard', [DashboardController::class, 'magazijn'])->name('magazijn.dashboard');
-        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });
 
     Route::middleware('role:vrijwilliger')->group(function (): void {

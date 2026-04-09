@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(LeverancierSeeder::class);
         $this->call(CoreBusinessSeeder::class);
+        $this->call(ProductsSeeder::class);
         DB::table('voorraad')->delete();
         DB::table('products')->delete();
         DB::table('categories')->delete();

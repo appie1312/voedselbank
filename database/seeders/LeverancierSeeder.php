@@ -16,7 +16,7 @@ class LeverancierSeeder extends Seeder
                 'contactpersoon_naam' => 'Jan de Vries',
                 'contactpersoon_email' => 'info@superfood.nl',
                 'telefoonnummer' => '030-1234567',
-                'volgende_levering' => null,
+                'volgende_levering' => '2024-10-05',
             ],
             [
                 'bedrijfsnaam' => 'Groente & Fruit NV',
@@ -24,7 +24,7 @@ class LeverancierSeeder extends Seeder
                 'contactpersoon_naam' => 'Sanne Bakker',
                 'contactpersoon_email' => 'contact@grof.nl',
                 'telefoonnummer' => '0346-765432',
-                'volgende_levering' => null,
+                'volgende_levering' => '2024-10-15',
             ],
             [
                 'bedrijfsnaam' => 'Bakkerij De Zoete',
@@ -32,7 +32,7 @@ class LeverancierSeeder extends Seeder
                 'contactpersoon_naam' => 'Pieter de Zoete',
                 'contactpersoon_email' => 'bakker@dezoete.nl',
                 'telefoonnummer' => '030-9876543',
-                'volgende_levering' => null,
+                'volgende_levering' => '2024-10-20',
             ],
         ];
 

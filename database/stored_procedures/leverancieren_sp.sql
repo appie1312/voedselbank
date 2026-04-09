@@ -1,3 +1,4 @@
+use voedselbank_maaskantje;
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS sp_get_all_leveranciers $$
