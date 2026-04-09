@@ -1,13 +1,18 @@
 <?php
 
+use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VoedselpakketController;
+use App\Http\Controllers\VoorraadController;
+use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
+
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
@@ -21,22 +26,51 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/uitloggen', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'redirectByRole'])->name('dashboard.redirect');
+    Route::get('/leveranciers', [LeverancierController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('leveranciers.index');
+    Route::get('/voorraad', [VoorraadController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('voorraad');
+    Route::get('/voorraad/nieuw', [VoorraadController::class, 'create'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.create');
+    Route::post('/voorraad', [VoorraadController::class, 'store'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.store');
+    Route::get('/voorraad/{productId}/wijzig', [VoorraadController::class, 'edit'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.edit');
+    Route::put('/voorraad/{productId}', [VoorraadController::class, 'update'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.update');
+    Route::delete('/voorraad/{productId}', [VoorraadController::class, 'destroy'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.destroy');
+    Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.create');
+    Route::post('/leveranciers', [LeverancierController::class, 'store'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.store');
+    Route::delete('/leveranciers/{leverancierId}', [LeverancierController::class, 'destroy'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('leveranciers.destroy');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
+        Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
         Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
+        Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
+        Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
+        Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
+        Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
+        Route::delete('/directie/klanten/{klantId}', [KlantenController::class, 'destroy'])->name('klanten.destroy');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
-        Route::get('/directie/voedselpakketten', [VoedselpakketController::class, 'index'])->name('Directie.voedselpakketten.index');
-        Route::get('/directie/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('Directie.voedselpakketten.create');
-        Route::post('/directie/voedselpakketten', [VoedselpakketController::class, 'store'])->name('Directie.voedselpakketten.store');
-        Route::get('/directie/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('Directie.voedselpakketten.edit');
-        Route::put('/directie/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('Directie.voedselpakketten.update');
-        Route::delete('/directie/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('Directie.voedselpakketten.destroy');
-
-    });
+        });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
         Route::get('/magazijn/dashboard', [DashboardController::class, 'magazijn'])->name('magazijn.dashboard');

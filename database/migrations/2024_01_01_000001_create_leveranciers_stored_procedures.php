@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // -------------------------------------------------------
-        // SP: Alle actieve leveranciers ophalen met hun producten
+        // SP: Alle leveranciers ophalen
         // -------------------------------------------------------
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_get_all_leveranciers');
         DB::unprepared('
@@ -20,35 +20,14 @@ return new class extends Migration
             BEGIN
                 SELECT
                     l.id,
-                    l.naam,
+                    l.bedrijfsnaam,
                     l.adres,
-                    l.telefoon,
-                    l.email,
-                    l.is_actief,
-                    l.datum_aangemaakt,
-                    l.datum_gewijzigd,
-                    GROUP_CONCAT(
-                        DISTINCT p.naam
-                        ORDER BY p.naam ASC
-                        SEPARATOR \', \'
-                    ) AS producten,
-                    COUNT(DISTINCT lp.product_id) AS aantal_producten
+                    l.contactpersoon_naam,
+                    l.contactpersoon_email,
+                    l.telefoonnummer,
+                    l.volgende_levering
                 FROM leveranciers l
-                LEFT JOIN leverancier_products lp
-                    ON lp.leverancier_id = l.id
-                LEFT JOIN products p
-                    ON p.id = lp.product_id
-                    AND p.is_actief = 1
-                GROUP BY
-                    l.id,
-                    l.naam,
-                    l.adres,
-                    l.telefoon,
-                    l.email,
-                    l.is_actief,
-                    l.datum_aangemaakt,
-                    l.datum_gewijzigd
-                ORDER BY l.naam ASC;
+                ORDER BY l.bedrijfsnaam ASC;
             END
         ');
 
@@ -58,7 +37,7 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_check_leverancier_naam');
         DB::unprepared('
             CREATE PROCEDURE sp_check_leverancier_naam(
-                IN p_naam VARCHAR(50),
+                IN p_bedrijfsnaam VARCHAR(150),
                 OUT p_bestaat TINYINT(1)
             )
             BEGIN
@@ -66,7 +45,7 @@ return new class extends Migration
 
                 SELECT COUNT(*) INTO p_bestaat
                 FROM leveranciers
-                WHERE LOWER(TRIM(naam)) = LOWER(TRIM(p_naam))
+                WHERE LOWER(TRIM(bedrijfsnaam)) = LOWER(TRIM(p_bedrijfsnaam))
                 LIMIT 1;
             END
         ');
@@ -77,10 +56,12 @@ return new class extends Migration
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_create_leverancier');
         DB::unprepared('
             CREATE PROCEDURE sp_create_leverancier(
-                IN  p_naam      VARCHAR(50),
-                IN  p_adres     VARCHAR(100),
-                IN  p_telefoon  VARCHAR(20),
-                IN  p_email     VARCHAR(100),
+                IN  p_bedrijfsnaam        VARCHAR(150),
+                IN  p_adres               VARCHAR(255),
+                IN  p_contactpersoon_naam VARCHAR(100),
+                IN  p_contactpersoon_email VARCHAR(150),
+                IN  p_telefoonnummer      VARCHAR(20),
+                IN  p_volgende_levering   DATETIME,
                 OUT p_new_id    INT,
                 OUT p_fout      VARCHAR(255)
             )
@@ -93,14 +74,32 @@ return new class extends Migration
                 -- Dubbelcheck: bestaat naam al?
                 SELECT COUNT(*) INTO v_bestaat
                 FROM leveranciers
-                WHERE LOWER(TRIM(naam)) = LOWER(TRIM(p_naam))
+                WHERE LOWER(TRIM(bedrijfsnaam)) = LOWER(TRIM(p_bedrijfsnaam))
                 LIMIT 1;
 
                 IF v_bestaat > 0 THEN
                     SET p_fout = \'deze bedrijfsnaam bestaat al\';
                 ELSE
-                    INSERT INTO leveranciers (naam, adres, telefoon, email, is_actief)
-                    VALUES (TRIM(p_naam), TRIM(p_adres), TRIM(p_telefoon), TRIM(p_email), 1);
+                    INSERT INTO leveranciers (
+                        bedrijfsnaam,
+                        adres,
+                        contactpersoon_naam,
+                        contactpersoon_email,
+                        telefoonnummer,
+                        volgende_levering,
+                        created_at,
+                        updated_at
+                    )
+                    VALUES (
+                        TRIM(p_bedrijfsnaam),
+                        TRIM(p_adres),
+                        TRIM(p_contactpersoon_naam),
+                        TRIM(p_contactpersoon_email),
+                        TRIM(p_telefoonnummer),
+                        p_volgende_levering,
+                        NOW(),
+                        NOW()
+                    );
 
                     SET p_new_id = LAST_INSERT_ID();
                 END IF;

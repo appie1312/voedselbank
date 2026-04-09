@@ -1,12 +1,15 @@
--- Stored Procedure: klantenoverzicht
--- Uitvoeren in MySQL Workbench op database `voedselbank_maaskantje`
+<?php
 
-USE voedselbank_maaskantje;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
-DROP PROCEDURE IF EXISTS sp_klanten_overzicht;
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klanten_overzicht');
 
-DELIMITER $$
-
+        DB::unprepared(<<<'SQL'
 CREATE PROCEDURE sp_klanten_overzicht (
     IN p_zoekterm VARCHAR(150),
     IN p_max_rijen INT
@@ -53,9 +56,12 @@ BEGIN
         k.aantal_babys
     ORDER BY k.gezinsnaam ASC
     LIMIT v_max_rijen;
-END $$
+END
+SQL);
+    }
 
-DELIMITER ;
-
--- Test:
--- CALL sp_klanten_overzicht(NULL, 5);
+    public function down(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klanten_overzicht');
+    }
+};
