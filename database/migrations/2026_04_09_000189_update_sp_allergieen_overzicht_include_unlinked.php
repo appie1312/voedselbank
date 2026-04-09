@@ -1,12 +1,15 @@
--- Stored Procedure: allergieenoverzicht met klantgegevens
--- Uitvoeren in MySQL Workbench op database `voedselbank_maaskantje`
+<?php
 
-USE voedselbank_maaskantje;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
-DROP PROCEDURE IF EXISTS sp_allergieen_overzicht;
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_allergieen_overzicht');
 
-DELIMITER $$
-
+        DB::unprepared(<<<'SQL'
 CREATE PROCEDURE sp_allergieen_overzicht (
     IN p_klant_id BIGINT UNSIGNED,
     IN p_zoekterm VARCHAR(100),
@@ -38,9 +41,12 @@ BEGIN
     )
     ORDER BY k.gezinsnaam ASC, wa.beschrijving ASC
     LIMIT v_max_rijen;
-END $$
+END
+SQL);
+    }
 
-DELIMITER ;
-
--- Test:
--- CALL sp_allergieen_overzicht(NULL, NULL, 10);
+    public function down(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_allergieen_overzicht');
+    }
+};

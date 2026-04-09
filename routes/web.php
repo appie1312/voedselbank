@@ -66,6 +66,8 @@ Route::middleware('auth')->group(function (): void {
         Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
         Route::delete('/directie/klanten/{klantId}', [KlantenController::class, 'destroy'])->name('klanten.destroy');
         Route::get('/directie/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
+        Route::post('/directie/allergieen', [AllergieController::class, 'store'])->name('allergieen.store');
+        Route::delete('/directie/allergieen/{allergieId}', [AllergieController::class, 'destroy'])->name('allergieen.destroy');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
         Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
         Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])->name('leveranciers.create');

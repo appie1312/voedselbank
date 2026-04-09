@@ -12,7 +12,6 @@ use Exception;
 class VoorraadController extends Controller
 {
     private VoorraadModel $voorraadModel;
-
     private const VOORRAAD_LOCATIES = [
         'Magazijn A',
         'Magazijn B',
@@ -131,6 +130,27 @@ class VoorraadController extends Controller
             'minimum_voorraad' => ['required', 'integer', 'min:0'],
             'locatie' => ['nullable', 'string', 'max:100', Rule::in(self::VOORRAAD_LOCATIES)],
         ]);
+
+        $voorraadItem = $this->voorraadModel->getVoorraadRegelByProductId($productId);
+
+        if (! $voorraadItem) {
+            return redirect()
+                ->route('voorraad')
+                ->with('error', 'Voorraadregel is niet gevonden.');
+        }
+
+        $nieuweLocatie = $data['locatie'] ?? null;
+        $huidigeLocatie = $voorraadItem->locatie ?? null;
+
+        if (
+            (int) $voorraadItem->hoeveelheid === (int) $data['hoeveelheid']
+            && (int) $voorraadItem->minimum_voorraad === (int) $data['minimum_voorraad']
+            && $huidigeLocatie === $nieuweLocatie
+        ) {
+            return redirect()
+                ->route('voorraad')
+                ->with('error', 'Je hebt ' . $voorraadItem->product_naam . ' niet gewijzigd.');
+        }
 
         $gewijzigd = $this->voorraadModel->updateVoorraadRegel(
             $productId,
