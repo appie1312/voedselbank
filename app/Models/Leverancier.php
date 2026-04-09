@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,13 @@ class Leverancier extends Model
 
     public static function getAllMetProducten(): Collection
     {
-        $leveranciers = collect(DB::select('CALL sp_get_all_leveranciers()'));
+        try {
+            $leveranciers = collect(DB::select('CALL sp_get_all_leveranciers()'));
+        } catch (QueryException $exception) {
+            // Fallback wanneer de stored procedure (nog) niet bestaat.
+            $leveranciers = DB::table('leveranciers')->orderBy('bedrijfsnaam')->get();
+        }
+
         $heeftPivotTabel = Schema::hasTable('leverancier_products');
         $heeftLeverancierKolom = Schema::hasColumn('products', 'leverancier_id');
 

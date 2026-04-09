@@ -17,14 +17,11 @@
 
 
                 @auth
-                                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('voorraad') }}">Voorraad</a>
-                </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
-                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('voorraad') }}">Voorraad</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
                     </li>
                     {{-- Toon voedselpakketten voor alle rollen die ermee werken. --}}
                     @if (auth()->user()->isDirectie() || auth()->user()->isMagazijnMedewerker() || auth()->user()->isVrijwilliger())
