@@ -15,9 +15,9 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-         $this->call(LeverancierSeeder::class);
+        $this->call(LeverancierSeeder::class);
         $this->call(CoreBusinessSeeder::class);
-        DB::table('voorraden')->delete();
+        DB::table('voorraad')->delete();
         DB::table('products')->delete();
         DB::table('categories')->delete();
 
@@ -139,7 +139,7 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        DB::table('voorraden')->insert([
+        DB::table('voorraad')->insert([
             [
                 'product_id' => 1,
                 'hoeveelheid' => 20,

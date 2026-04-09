@@ -14,11 +14,15 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<?php echo e(route('home')); ?>">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?php echo e(route('voorraad')); ?>">Voorraad</a>
-                </li>
+
 
                 <?php if(auth()->guard()->check()): ?>
+                                <li class="nav-item">
+                    <a class="nav-link" href="<?php echo e(route('voorraad')); ?>">Voorraad</a>
+                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo e(route('leveranciers.index')); ?>">Leveranciers</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo e(route('dashboard.redirect')); ?>">Dashboard</a>
                     </li>
@@ -28,7 +32,7 @@
 
                     <?php if(auth()->user()->isDirectie()): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?php echo e(route('accounts.index')); ?>">Accounts</a>
+                            <a class="nav-link" href="<?php echo e(route('klanten.index')); ?>">Klanten</a>
                         </li>
                     <?php endif; ?>
 

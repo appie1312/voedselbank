@@ -1,6 +1,14 @@
-﻿<?php if(session('status_success')): ?>
+<?php if(session('status_success')): ?>
     <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="5000">
         <?php echo e(session('status_success')); ?>
+
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<?php endif; ?>
+
+<?php if(isset($status_success)): ?>
+    <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="5000">
+        <?php echo e($status_success); ?>
 
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>

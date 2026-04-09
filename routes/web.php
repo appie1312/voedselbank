@@ -10,7 +10,7 @@ use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
-Route::get('/voorraad', [VoorraadController::class, 'index'])->name('voorraad');
+
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function (): void {
     });
 
     Route::middleware('role:vrijwilliger')->group(function (): void {
+        Route::get('/voorraad', [VoorraadController::class, 'index'])->name('voorraad');
                 Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
         // Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
 
