@@ -66,6 +66,7 @@
                         <tr>
                             <th>Pakket ID</th>
                             <th>Gezinsnaam</th>
+                            <th>Inhoud</th>
                             <th>Samengesteld op</th>
                             <th>Status</th>
                             <th>Acties</th>
@@ -74,27 +75,56 @@
                     <tbody>
                         @if (isset($status_error))
                             <tr>
-                                <td colspan="5">Door een storing kunnen pakketten nu niet worden weergegeven.</td>
+                                <td colspan="6">Door een storing kunnen pakketten nu niet worden weergegeven.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
-                                    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                                    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
                                 </tr>
                             @endfor
                         @elseif (!isset($pakketten) || $pakketten->isEmpty())
                             <tr>
-                                <td colspan="5" class="text-center">Geen voedselpakketten gevonden.</td>
+                                <td colspan="6" class="text-center">Er zijn geen voedselpakketten gevonden.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
-                                    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                                    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
                                 </tr>
                             @endfor
                         @else
                             @foreach ($pakketten as $pakket)
                                 <tr>
                                     <td class="fw-bold">#{{ $pakket->id }}</td>
-                                    <td>{{ $pakket->klant->gezinsnaam ?? 'Geen naam' }}</td>
+                                    <td>{{ $pakket->gezinsnaam ?? 'Geen naam' }}</td>
+                                    <td>
+                                        {{-- Inhoud compact tonen via modal zodat de tabel leesbaar blijft. --}}
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-info"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#inhoudModal{{ $pakket->id }}"
+                                        >
+                                            Info
+                                        </button>
+
+                                        <div class="modal fade" id="inhoudModal{{ $pakket->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Inhoud pakket #{{ $pakket->id }}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        @if (!empty($pakket->inhoud_tekst) && $pakket->inhoud_tekst !== '-')
+                                                            <p class="mb-0">{{ $pakket->inhoud_tekst }}</p>
+                                                        @else
+                                                            <p class="mb-0 text-muted">Dit pakket heeft nog geen inhoud.</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>{{ \Carbon\Carbon::parse($pakket->datum_samenstelling)->format('d-m-Y') }}</td>
                                     <td>
                                         @if(is_null($pakket->datum_uitgifte))
@@ -104,20 +134,53 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-info text-white">Samenstellen</a>
+                                        <a href="{{ route(auth()->user()->role . '.voedselpakketten.samenstellen', $pakket->id) }}" class="btn btn-sm btn-info text-white">Samenstellen</a>
                                         
                                         <a href="{{ route(auth()->user()->role . '.voedselpakketten.edit', $pakket->id) }}" class="btn btn-sm btn-warning">Wijzig</a>
-                                        <form action="{{ route(auth()->user()->role . '.voedselpakketten.destroy', $pakket->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Zeker weten dat je dit pakket wilt verwijderen?')">Verwijder</button>
-                                        </form>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#verwijderModal{{ $pakket->id }}"
+                                        >
+                                            Verwijder
+                                        </button>
+
+                                        <div class="modal fade" id="verwijderModal{{ $pakket->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Voedselpakket verwijderen</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        @if (is_null($pakket->datum_uitgifte))
+                                                            {{-- UI-hint; echte blokkade zit ook server-side. --}}
+                                                            Dit pakket kan niet verwijderd worden, want het is nog niet opgehaald.
+                                                        @else
+                                                            Weet je zeker dat je pakket <strong>#{{ $pakket->id }}</strong> wilt verwijderen?
+                                                        @endif
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Sluiten</button>
+                                                        @if (!is_null($pakket->datum_uitgifte))
+                                                            <form action="{{ route(auth()->user()->role . '.voedselpakketten.destroy', $pakket->id) }}" method="POST" class="d-inline">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger">Ja, verwijder</button>
+                                                            </form>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
 
                             @for ($index = 0; $index < $legeRijen; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
