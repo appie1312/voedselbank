@@ -52,11 +52,14 @@
                             @endif
                         </td>
                         <td>
-                            <form method="POST" action="{{ route('leveranciers.destroy', $leverancier->id) }}" onsubmit="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Verwijderen</button>
-                            </form>
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('leveranciers.edit', $leverancier->id) }}" class="btn btn-sm btn-danger">Wijzig</a>
+                                <form method="POST" action="{{ route('leveranciers.destroy', $leverancier->id) }}" onsubmit="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Verwijderen</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
