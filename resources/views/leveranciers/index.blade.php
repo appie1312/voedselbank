@@ -40,7 +40,7 @@
                             @if(!empty($leverancier->producten) && $leverancier->producten->isNotEmpty())
                                 <ul class="mb-0 ps-3">
                                     @foreach($leverancier->producten as $product)
-                                        <li>{{ $product->naam }}</li>
+                                        <li>{{ $product->productnaam }}</li>
                                     @endforeach
                                 </ul>
                             @else

@@ -3,15 +3,16 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_get_all_leveranciers $$
 CREATE PROCEDURE sp_get_all_leveranciers()
 BEGIN
-    SELECT 
+    SELECT
         l.id,
-        l.naam,
+        l.bedrijfsnaam,
         l.adres,
-        l.telefoon,
-        l.email,
-        l.is_actief
+        l.contactpersoon_naam,
+        l.contactpersoon_email,
+        l.telefoonnummer,
+        l.volgende_levering
     FROM leveranciers l
-    WHERE l.is_actief = 1;
+    ORDER BY l.bedrijfsnaam ASC;
 END $$
 
 DELIMITER ;
