@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(LeverancierSeeder::class);
         $this->call(CoreBusinessSeeder::class);
+        $this->call(ProductsSeeder::class);
 
         $gebruikers = [
             [
