@@ -345,26 +345,20 @@ namespace App\Models {
     /**
      * App\Models\Klant
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $aantal_babys
-     * @property int $aantal_kinderen
-     * @property int $aantal_volwassenen
-     * @property string|null $emailadres
-     * @property string $telefoonnummer
-     * @property string $adres
-     * @property string $gezinsnaam
+     * @property string $datum_gewijzigd
+     * @property string $datum_aangemaakt
+     * @property string|null $adres
+     * @property string|null $telefoon
+     * @property string|null $email
+     * @property string $naam
      * @property int $id
      * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereGezinsnaam($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereNaam($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereEmail($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereTelefoon($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereAdres($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereTelefoonnummer($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereEmailadres($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereAantalVolwassenen($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereAantalKinderen($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereAantalBabys($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereUpdatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereDatumAangemaakt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant whereDatumGewijzigd($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Klant>|Klant query()
@@ -687,24 +681,22 @@ namespace App\Models {
     /**
      * App\Models\Leverancier
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $volgende_levering
-     * @property string $telefoonnummer
-     * @property string $contactpersoon_email
-     * @property string $contactpersoon_naam
-     * @property string $adres
-     * @property string $bedrijfsnaam
+     * @property string $datum_gewijzigd
+     * @property string $datum_aangemaakt
+     * @property bool $is_actief
+     * @property string|null $email
+     * @property string|null $telefoon
+     * @property string|null $adres
+     * @property string $naam
      * @property int $id
      * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereBedrijfsnaam($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereNaam($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereAdres($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereContactpersoonNaam($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereContactpersoonEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereTelefoonnummer($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereVolgendeLevering($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereUpdatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereTelefoon($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereEmail($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereIsActief($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereDatumAangemaakt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier whereDatumGewijzigd($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Leverancier>|Leverancier query()
