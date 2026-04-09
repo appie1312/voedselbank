@@ -181,6 +181,7 @@ CREATE TABLE IF NOT EXISTS klanten (
     adres VARCHAR(255) NOT NULL,
     telefoonnummer VARCHAR(20) NOT NULL,
     emailadres VARCHAR(150) NULL,
+    aanwezigheidsstatus VARCHAR(30) NOT NULL DEFAULT 'binnen_land',
     allergieen TEXT NULL,
     aantal_volwassenen INT NOT NULL DEFAULT 0,
     aantal_kinderen INT NOT NULL DEFAULT 0,
@@ -300,6 +301,81 @@ ON DUPLICATE KEY UPDATE
     telefoonnummer = VALUES(telefoonnummer),
     volgende_levering = VALUES(volgende_levering),
     updated_at = NOW();
+
+INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, aanwezigheidsstatus, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
+SELECT 'Familie Jansen', 'Dorpsstraat 12, Maaskantje', '06-11111111', 'jansen@voorbeeld.nl', 'binnen_land', 'Geen varkensvlees', 2, 2, 0, NOW(), NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Jansen' AND telefoonnummer = '06-11111111'
+);
+
+INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, aanwezigheidsstatus, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
+SELECT 'Familie De Vries', 'Molenweg 8, Maaskantje', '06-22222222', 'devries@voorbeeld.nl', 'buiten_land', 'Lactose', 1, 3, 1, NOW(), NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie De Vries' AND telefoonnummer = '06-22222222'
+);
+
+INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, aanwezigheidsstatus, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
+SELECT 'Familie Bakker', 'Stationslaan 21, Maaskantje', '06-33333333', 'bakker@voorbeeld.nl', 'binnen_land', 'Gluten', 2, 1, 0, NOW(), NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Bakker' AND telefoonnummer = '06-33333333'
+);
+
+INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, aanwezigheidsstatus, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
+SELECT 'Familie El Idrissi', 'Waterweg 4, Maaskantje', '06-44444444', 'elidrissi@voorbeeld.nl', 'afwezig', 'Vegetarisch', 2, 2, 1, NOW(), NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie El Idrissi' AND telefoonnummer = '06-44444444'
+);
+
+INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, aanwezigheidsstatus, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
+SELECT 'Familie Van Dijk', 'Kerkstraat 2, Maaskantje', '06-55555555', 'vandijk@voorbeeld.nl', 'binnen_land', 'Pinda''s', 1, 1, 0, NOW(), NOW()
+WHERE NOT EXISTS (
+    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Van Dijk' AND telefoonnummer = '06-55555555'
+);
+
+INSERT INTO klant_wens (klant_id, wens_id)
+SELECT k.id, w.id
+FROM klanten AS k
+JOIN wens_allergies AS w ON w.beschrijving = 'Geen varkensvlees'
+WHERE k.gezinsnaam = 'Familie Jansen'
+    AND NOT EXISTS (
+        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
+    );
+
+INSERT INTO klant_wens (klant_id, wens_id)
+SELECT k.id, w.id
+FROM klanten AS k
+JOIN wens_allergies AS w ON w.beschrijving = 'Lactose'
+WHERE k.gezinsnaam = 'Familie De Vries'
+    AND NOT EXISTS (
+        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
+    );
+
+INSERT INTO klant_wens (klant_id, wens_id)
+SELECT k.id, w.id
+FROM klanten AS k
+JOIN wens_allergies AS w ON w.beschrijving = 'Gluten'
+WHERE k.gezinsnaam = 'Familie Bakker'
+    AND NOT EXISTS (
+        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
+    );
+
+INSERT INTO klant_wens (klant_id, wens_id)
+SELECT k.id, w.id
+FROM klanten AS k
+JOIN wens_allergies AS w ON w.beschrijving = 'Vegetarisch'
+WHERE k.gezinsnaam = 'Familie El Idrissi'
+    AND NOT EXISTS (
+        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
+    );
+
+INSERT INTO klant_wens (klant_id, wens_id)
+SELECT k.id, w.id
+FROM klanten AS k
+JOIN wens_allergies AS w ON w.beschrijving = 'Pinda''s'
+WHERE k.gezinsnaam = 'Familie Van Dijk'
+    AND NOT EXISTS (
+        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
+    );
 
 INSERT INTO products (productnaam, ean_nummer, aantal_in_voorraad, categorie_id, leverancier_id, created_at, updated_at)
 VALUES

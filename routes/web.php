@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LeverancierController;
+use App\Http\Controllers\AllergieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
@@ -24,9 +25,6 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/uitloggen', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'redirectByRole'])->name('dashboard.redirect');
-    Route::get('/leveranciers', [LeverancierController::class, 'index'])
-        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
-        ->name('leveranciers.index');
     Route::get('/voorraad', [VoorraadController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('voorraad');
@@ -66,7 +64,16 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
         Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
         Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
+        Route::delete('/directie/klanten/{klantId}', [KlantenController::class, 'destroy'])->name('klanten.destroy');
+        Route::get('/directie/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
+        Route::post('/directie/allergieen', [AllergieController::class, 'store'])->name('allergieen.store');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
+        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
+        Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])->name('leveranciers.create');
+        Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
+        Route::get('/leveranciers/{leverancierId}/wijzig', [LeverancierController::class, 'edit'])->name('leveranciers.edit');
+        Route::put('/leveranciers/{leverancierId}', [LeverancierController::class, 'update'])->name('leveranciers.update');
+        Route::delete('/leveranciers/{leverancierId}', [LeverancierController::class, 'destroy'])->name('leveranciers.destroy');
         });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {

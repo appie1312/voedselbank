@@ -1,12 +1,15 @@
--- Stored Procedure: klant toevoegen
--- Uitvoeren in MySQL Workbench op database `voedselbank_maaskantje`
+<?php
 
-USE voedselbank_maaskantje;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
-DROP PROCEDURE IF EXISTS sp_klant_toevoegen;
+return new class extends Migration
+{
+    public function up(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klant_toevoegen');
 
-DELIMITER $$
-
+        DB::unprepared(<<<'SQL'
 CREATE PROCEDURE sp_klant_toevoegen (
     IN p_gezinsnaam VARCHAR(100),
     IN p_adres VARCHAR(255),
@@ -63,9 +66,12 @@ BEGIN
         SET v_klant_id = LAST_INSERT_ID();
         SELECT 1 AS toegevoegd, 0 AS bestaat_al, v_klant_id AS klant_id;
     END IF;
-END $$
+END
+SQL);
+    }
 
-DELIMITER ;
-
--- Test:
--- CALL sp_klant_toevoegen('Familie Test', 'Teststraat 1', '0612345678', 'test@voorbeeld.nl', 'binnen_land', 2, 1, 0);
+    public function down(): void
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS sp_klant_toevoegen');
+    }
+};

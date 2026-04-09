@@ -21,6 +21,7 @@ class KlantToevoegenRequest extends FormRequest
             'adres' => ['required', 'string', 'max:255'],
             'telefoonnummer' => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]*$/'],
             'emailadres' => ['nullable', 'email:rfc,dns', 'max:150'],
+            'aanwezigheidsstatus' => ['required', 'in:binnen_land,buiten_land,afwezig'],
             'aantal_volwassenen' => ['required', 'integer', 'min:0', 'max:20'],
             'aantal_kinderen' => ['required', 'integer', 'min:0', 'max:20'],
             'aantal_babys' => ['required', 'integer', 'min:0', 'max:20'],
@@ -39,6 +40,8 @@ class KlantToevoegenRequest extends FormRequest
             'telefoonnummer.required' => 'Telefoonnummer is verplicht.',
             'telefoonnummer.regex' => 'Telefoonnummer bevat ongeldige tekens.',
             'emailadres.email' => 'E-mailadres is ongeldig.',
+            'aanwezigheidsstatus.required' => 'Aanwezigheidsstatus is verplicht.',
+            'aanwezigheidsstatus.in' => 'Aanwezigheidsstatus is ongeldig.',
             'aantal_volwassenen.required' => 'Aantal volwassenen is verplicht.',
             'aantal_kinderen.required' => 'Aantal kinderen is verplicht.',
             'aantal_babys.required' => 'Aantal baby\'s is verplicht.',
@@ -55,6 +58,7 @@ class KlantToevoegenRequest extends FormRequest
             'adres' => trim((string) $this->input('adres')),
             'telefoonnummer' => trim((string) $this->input('telefoonnummer')),
             'emailadres' => trim((string) $this->input('emailadres')),
+            'aanwezigheidsstatus' => trim((string) $this->input('aanwezigheidsstatus')),
         ]);
     }
 }

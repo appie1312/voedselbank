@@ -14,7 +14,10 @@
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                 <h1 class="h4 mb-0">Overzicht Klanten</h1>
-                <a href="{{ route('klanten.create') }}" class="btn btn-success">Klant toevoegen</a>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('allergieen.index') }}" class="btn btn-outline-primary">Allergieen overzicht</a>
+                    <a href="{{ route('klanten.create') }}" class="btn btn-success">Klant toevoegen</a>
+                </div>
             </div>
 
             <form method="GET" action="{{ route('klanten.index') }}" class="row g-3 needs-validation" novalidate>
@@ -66,16 +69,18 @@
                             <th>Adres</th>
                             <th>Telefoonnummer</th>
                             <th>E-mailadres</th>
+                            <th>Status</th>
                             <th>Aantal Volwassen</th>
                             <th>Aantal Kinderen</th>
                             <th>Aantal Baby</th>
+                            <th>Allergie</th>
                             <th>Actie</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (isset($status_error))
                             <tr>
-                                <td colspan="8">Door een storing kunnen klanten nu niet worden weergegeven.</td>
+                                <td colspan="10">Door een storing kunnen klanten nu niet worden weergegeven.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
@@ -83,15 +88,17 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
+                                    <td>-</td>
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                     <td>-</td>
                                 </tr>
                             @endfor
                         @elseif ($klanten->isEmpty())
                             <tr>
-                                <td colspan="8">Geen klanten gevonden.</td>
+                                <td colspan="10">Geen klanten gevonden.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
@@ -99,26 +106,62 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
+                                    <td>-</td>
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                     <td>-</td>
                                 </tr>
                             @endfor
                         @else
                             @foreach ($klanten as $klant)
+                                @php
+                                    $statusWaarde = (string) ($klant->aanwezigheidsstatus ?? '');
+                                    $kanVerwijderen = in_array($statusWaarde, ['afwezig', 'buiten_land'], true);
+                                    $isAanwezig = $statusWaarde === 'binnen_land';
+                                    $aanwezigLabel = $isAanwezig ? 'Aanwezig' : ($kanVerwijderen ? 'Niet aanwezig' : 'Onbekend');
+                                    $statusDetail = match ($statusWaarde) {
+                                        'binnen_land' => 'Binnen land',
+                                        'buiten_land' => 'Buiten land',
+                                        'afwezig' => 'Afwezig',
+                                        default => 'Status onbekend',
+                                    };
+                                @endphp
                                 <tr>
                                     <td>{{ $klant->gezinsnaam }}</td>
                                     <td>{{ $klant->adres }}</td>
                                     <td>{{ $klant->telefoonnummer }}</td>
                                     <td>{{ $klant->emailadres ?: '-' }}</td>
+                                    <td>
+                                        <div class="status-wrap">
+                                            <span class="status-pill {{ $isAanwezig ? 'status-pill--present' : 'status-pill--away' }}">
+                                                {{ $aanwezigLabel }}
+                                            </span>
+                                            <div class="status-subtext">{{ $statusDetail }}</div>
+                                        </div>
+                                    </td>
                                     <td>{{ (int) $klant->aantal_volwassenen }}</td>
                                     <td>{{ (int) $klant->aantal_kinderen }}</td>
                                     <td>{{ (int) $klant->aantal_babys }}</td>
                                     <td>
-                                        <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold">
-                                            Wijzig klant
+                                        <a href="{{ route('allergieen.index', ['klant_id' => $klant->id]) }}" class="btn btn-info btn-sm fw-semibold text-white">
+                                            Allergie
                                         </a>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2 flex-wrap action-group">
+                                            <a href="{{ route('klanten.edit', ['klantId' => $klant->id]) }}" class="btn btn-warning btn-sm fw-semibold action-btn">
+                                                Wijzig
+                                            </a>
+                                            <form method="POST" action="{{ route('klanten.destroy', ['klantId' => $klant->id]) }}" class="m-0" onsubmit="return confirm('Weet je zeker dat je deze klant wilt verwijderen?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm fw-semibold action-btn">
+                                                    Verwijder
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -129,9 +172,11 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
+                                    <td>-</td>
                                     <td>0</td>
                                     <td>0</td>
                                     <td>0</td>
+                                    <td>-</td>
                                     <td>-</td>
                                 </tr>
                             @endfor
@@ -158,4 +203,62 @@
             });
         });
     </script>
+
+    <style>
+        .action-group {
+            min-width: 13.5rem;
+        }
+
+        .action-btn {
+            min-width: 6.2rem;
+        }
+
+        .status-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.18rem;
+            min-width: 7.2rem;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0.3rem 0.58rem;
+            border: 1px solid transparent;
+        }
+
+        .status-pill--present {
+            background-color: #fff3cd;
+            border-color: #ffe69c;
+            color: #664d03;
+        }
+
+        .status-pill--away {
+            background-color: #d1f4e0;
+            border-color: #9fd8be;
+            color: #0f5132;
+        }
+
+        .status-subtext {
+            color: #6c757d;
+            font-size: 0.72rem;
+            line-height: 1.1;
+        }
+
+        .table > :not(caption) > * > * {
+            vertical-align: middle;
+        }
+
+        @media (max-width: 1199px) {
+            .action-group {
+                min-width: 11.5rem;
+            }
+        }
+    </style>
 @endsection

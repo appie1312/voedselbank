@@ -21,9 +21,17 @@ class VoorraadController extends Controller
         'Schap 2',
     ];
 
+    private const VOORRAAD_LOCATIES = [
+        'Magazijn A',
+        'Magazijn B',
+        'Koeling',
+        'Vriezer',
+        'Schap 1',
+        'Schap 2',
+    ];
+
     public function __construct()
     {
-        // Geef de PDO connectie door aan het model
         $this->voorraadModel = new VoorraadModel(DB::connection()->getPdo());
     }
 
