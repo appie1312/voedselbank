@@ -5,7 +5,11 @@
 @section('content')
     <div class="mb-3">
         <h1 class="h3 mb-1">Accounts Overzicht</h1>
+<<<<<<< HEAD
         <p class="text-secondary mb-0"></p>
+=======
+        <p class="text-secondary mb-0">Alle gebruikers voor directie, met gegevens via INNER JOIN.</p>
+>>>>>>> 49b7a9e1d147f3414d7c2a98dea1b09a3d7ceca6
     </div>
 
     <div class="card shadow-sm border-0">
