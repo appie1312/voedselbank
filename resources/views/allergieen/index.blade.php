@@ -126,15 +126,17 @@
                             <th>Gezinsnaam</th>
                             <th>Allergie ID</th>
                             <th>Beschrijving</th>
+                            <th>Actie</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (isset($status_error))
                             <tr>
-                                <td colspan="4">Door een storing kunnen allergieen nu niet worden weergegeven.</td>
+                                <td colspan="5">Door een storing kunnen allergieen nu niet worden weergegeven.</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
@@ -148,20 +150,45 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
+                                    <td>-</td>
                                 </tr>
                             @endfor
                         @else
+                            @php
+                                $verwerkteAllergieIds = [];
+                            @endphp
                             @foreach ($allergieen as $allergie)
+                                @php
+                                    $allergieId = (int) $allergie->allergie_id;
+                                    $toonVerwijderKnop = ! in_array($allergieId, $verwerkteAllergieIds, true);
+                                    if ($toonVerwijderKnop) {
+                                        $verwerkteAllergieIds[] = $allergieId;
+                                    }
+                                @endphp
                                 <tr>
                                     <td>{{ isset($allergie->klant_id) ? (int) $allergie->klant_id : '-' }}</td>
                                     <td>{{ $allergie->gezinsnaam ?? '-' }}</td>
-                                    <td>{{ (int) $allergie->allergie_id }}</td>
+                                    <td>{{ $allergieId }}</td>
                                     <td>{{ $allergie->allergie_beschrijving }}</td>
+                                    <td>
+                                        @if ($toonVerwijderKnop)
+                                            <form method="POST" action="{{ route('allergieen.destroy', ['allergieId' => $allergieId]) }}" onsubmit="return confirm('Weet je zeker dat je deze allergie wilt verwijderen?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm fw-semibold">
+                                                    Verwijder Allergie
+                                                </button>
+                                            </form>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
 
                             @for ($index = 0; $index < $legeRijen; $index++)
                                 <tr class="table-light">
+                                    <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>

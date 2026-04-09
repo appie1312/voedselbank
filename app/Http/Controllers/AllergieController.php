@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AllergieOverzichtRequest;
 use App\Http\Requests\AllergieToevoegenRequest;
+use App\Http\Requests\AllergieVerwijderenRequest;
 use App\Models\Allergie;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,51 @@ use Throwable;
 
 class AllergieController extends Controller
 {
+    public function destroy(AllergieVerwijderenRequest $request, int $allergieId): RedirectResponse
+    {
+        try {
+            $request->validated();
+            $resultaat = Allergie::verwijderViaStoredProcedure($allergieId);
+
+            if (! $resultaat['allergie_bestaat']) {
+                return redirect()
+                    ->route('allergieen.index')
+                    ->with('status_error', 'Deze allergie kon niet worden gevonden.');
+            }
+
+            if ($resultaat['in_gebruik']) {
+                Log::warning('Technische log: allergie verwijderen geblokkeerd, allergie is in gebruik.', [
+                    'user_id' => $request->user()?->id,
+                    'allergie_id' => $allergieId,
+                ]);
+
+                return redirect()
+                    ->route('allergieen.index')
+                    ->with('status_error', 'De allergie kan niet worden verwijderd omdat deze nog in gebruik is');
+            }
+
+            Log::info('Technische log: allergie succesvol verwijderd.', [
+                'user_id' => $request->user()?->id,
+                'allergie_id' => $allergieId,
+            ]);
+
+            return redirect()
+                ->route('allergieen.index')
+                ->with('status_success', 'De allergie is succesvol verwijderd');
+        } catch (Throwable $exception) {
+            Log::error('Technische log: allergie verwijderen mislukt.', [
+                'user_id' => $request->user()?->id,
+                'allergie_id' => $allergieId,
+                'error_class' => $exception::class,
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('allergieen.index')
+                ->with('status_error', 'Er is een storing. De allergie kon niet worden verwijderd.');
+        }
+    }
+
     public function store(AllergieToevoegenRequest $request): RedirectResponse
     {
         try {

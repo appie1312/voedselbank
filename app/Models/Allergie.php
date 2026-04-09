@@ -68,6 +68,31 @@ class Allergie extends Model
         return collect($resultaten);
     }
 
+    /**
+     * @return array{verwijderd: bool, in_gebruik: bool, allergie_bestaat: bool}
+     */
+    public static function verwijderViaStoredProcedure(int $allergieId): array
+    {
+        try {
+            $resultaat = DB::select('CALL sp_allergie_verwijderen(?)', [$allergieId]);
+        } catch (QueryException $exception) {
+            // Veilige fallback als de stored procedure nog niet bestaat.
+            if (! str_contains(strtolower($exception->getMessage()), 'sp_allergie_verwijderen')) {
+                throw $exception;
+            }
+
+            return self::verwijderViaQuery($allergieId);
+        }
+
+        $eersteRij = $resultaat[0] ?? null;
+
+        return [
+            'verwijderd' => ((int) ($eersteRij->verwijderd ?? 0)) === 1,
+            'in_gebruik' => ((int) ($eersteRij->in_gebruik ?? 0)) === 1,
+            'allergie_bestaat' => ((int) ($eersteRij->allergie_bestaat ?? 0)) === 1,
+        ];
+    }
+
     private static function haalOverzichtViaJoinQuery(?int $klantId, string $zoekterm, int $aantalRijen): Collection
     {
         return DB::table('wens_allergies as wa')
@@ -157,6 +182,46 @@ class Allergie extends Model
             'bestaat_al' => $bestaatAl,
             'klant_bestaat' => true,
             'allergie_id' => $allergieId,
+        ];
+    }
+
+    /**
+     * @return array{verwijderd: bool, in_gebruik: bool, allergie_bestaat: bool}
+     */
+    private static function verwijderViaQuery(int $allergieId): array
+    {
+        $allergieBestaat = DB::table('wens_allergies')
+            ->where('id', $allergieId)
+            ->exists();
+
+        if (! $allergieBestaat) {
+            return [
+                'verwijderd' => false,
+                'in_gebruik' => false,
+                'allergie_bestaat' => false,
+            ];
+        }
+
+        $inGebruik = DB::table('klant_wens')
+            ->where('wens_id', $allergieId)
+            ->exists();
+
+        if ($inGebruik) {
+            return [
+                'verwijderd' => false,
+                'in_gebruik' => true,
+                'allergie_bestaat' => true,
+            ];
+        }
+
+        DB::table('wens_allergies')
+            ->where('id', $allergieId)
+            ->delete();
+
+        return [
+            'verwijderd' => true,
+            'in_gebruik' => false,
+            'allergie_bestaat' => true,
         ];
     }
 }
