@@ -4,10 +4,11 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
-Route::get('/voorraad', [DashboardController::class, 'voorraad'])->name('voorraad');
+Route::get('/voorraad', [VoorraadController::class, 'index'])->name('voorraad');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
