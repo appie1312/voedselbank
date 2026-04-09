@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LeverancierController;
+use App\Http\Controllers\AllergieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
@@ -67,6 +68,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
         Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
         Route::delete('/directie/klanten/{klantId}', [KlantenController::class, 'destroy'])->name('klanten.destroy');
+        Route::get('/directie/allergieen', [AllergieController::class, 'index'])->name('allergieen.index');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
         });
 
