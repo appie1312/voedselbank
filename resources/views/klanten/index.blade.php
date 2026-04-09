@@ -12,7 +12,10 @@
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
-            <h1 class="h4 mb-3">Overzicht Klanten</h1>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <h1 class="h4 mb-0">Overzicht Klanten</h1>
+                <a href="{{ route('klanten.create') }}" class="btn btn-success">Klant toevoegen</a>
+            </div>
 
             <form method="GET" action="{{ route('klanten.index') }}" class="row g-3 needs-validation" novalidate>
                 <div class="col-12 col-lg-6">

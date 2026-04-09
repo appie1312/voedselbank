@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
         Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
+        Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
+        Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
     });
 
