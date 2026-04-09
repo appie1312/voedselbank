@@ -16,9 +16,11 @@
                 </li>
 
                 @auth
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
-                    </li>
+                    @if (auth()->user()->isDirectie())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('voorraad') }}">Voorraad</a>
                     </li>

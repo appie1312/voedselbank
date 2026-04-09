@@ -23,21 +23,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/uitloggen', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [DashboardController::class, 'redirectByRole'])->name('dashboard.redirect');
-    Route::get('/leveranciers', [LeverancierController::class, 'index'])
-        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
-        ->name('leveranciers.index');
     Route::get('/voorraad', [VoorraadController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('voorraad');
-    Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
-        ->middleware('role:directie,magazijn_medewerker')
-        ->name('leveranciers.create');
-    Route::post('/leveranciers', [LeverancierController::class, 'store'])
-        ->middleware('role:directie,magazijn_medewerker')
-        ->name('leveranciers.store');
-    Route::delete('/leveranciers/{leverancierId}', [LeverancierController::class, 'destroy'])
-        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
-        ->name('leveranciers.destroy');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
@@ -51,6 +39,12 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
         Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
+        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
+        Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])->name('leveranciers.create');
+        Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
+        Route::get('/leveranciers/{leverancierId}/wijzig', [LeverancierController::class, 'edit'])->name('leveranciers.edit');
+        Route::put('/leveranciers/{leverancierId}', [LeverancierController::class, 'update'])->name('leveranciers.update');
+        Route::delete('/leveranciers/{leverancierId}', [LeverancierController::class, 'destroy'])->name('leveranciers.destroy');
         });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
