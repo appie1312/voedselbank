@@ -37,16 +37,18 @@ class LeverancierSeeder extends Seeder
         ];
 
         foreach ($leveranciers as $leverancier) {
-            DB::table('leveranciers')->insert([
-                'bedrijfsnaam' => $leverancier['bedrijfsnaam'],
-                'adres' => $leverancier['adres'],
-                'contactpersoon_naam' => $leverancier['contactpersoon_naam'],
-                'contactpersoon_email' => $leverancier['contactpersoon_email'],
-                'telefoonnummer' => $leverancier['telefoonnummer'],
-                'volgende_levering' => $leverancier['volgende_levering'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            DB::table('leveranciers')->updateOrInsert(
+                ['bedrijfsnaam' => $leverancier['bedrijfsnaam']],
+                [
+                    'adres' => $leverancier['adres'],
+                    'contactpersoon_naam' => $leverancier['contactpersoon_naam'],
+                    'contactpersoon_email' => $leverancier['contactpersoon_email'],
+                    'telefoonnummer' => $leverancier['telefoonnummer'],
+                    'volgende_levering' => $leverancier['volgende_levering'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
     }
 }

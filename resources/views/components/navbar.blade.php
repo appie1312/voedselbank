@@ -1,4 +1,4 @@
-﻿<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
+<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-success" href="{{ route('home') }}">
             <span class="rounded-circle border border-success-subtle bg-success-subtle d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">VB</span>
@@ -15,7 +15,11 @@
                     <a class="nav-link" href="{{ route('home') }}">Home</a>
                 </li>
 
+
                 @auth
+                                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('voorraad') }}">Voorraad</a>
+                </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
                     </li>

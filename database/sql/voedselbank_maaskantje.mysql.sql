@@ -1,6 +1,6 @@
 -- ==========================================
--- VOEDSELBANK MAASKANTJE - CORRECTE MYSQL SCRIPT
--- Past bij de huidige Laravel app (3 rollen + Laravel systeemtabellen)
+-- VOEDSELBANK MAASKANTJE - TEAM MYSQL SCRIPT
+-- + voorraad + leverancier_products
 -- ==========================================
 
 CREATE DATABASE IF NOT EXISTS voedselbank_maaskantje
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS categories (
 
 CREATE TABLE IF NOT EXISTS leveranciers (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    bedrijfsnaam VARCHAR(150) NOT NULL,
+    bedrijfsnaam VARCHAR(150) NOT NULL UNIQUE,
     adres VARCHAR(255) NOT NULL,
     contactpersoon_naam VARCHAR(100) NOT NULL,
     contactpersoon_email VARCHAR(150) NOT NULL,
@@ -144,6 +144,35 @@ CREATE TABLE IF NOT EXISTS products (
     CONSTRAINT fk_products_leverancier
         FOREIGN KEY (leverancier_id) REFERENCES leveranciers(id)
         ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS leverancier_products (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    leverancier_id BIGINT UNSIGNED NOT NULL,
+    product_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    CONSTRAINT fk_leverancier_products_leverancier
+        FOREIGN KEY (leverancier_id) REFERENCES leveranciers(id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_leverancier_products_product
+        FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE,
+    CONSTRAINT uk_leverancier_products UNIQUE (leverancier_id, product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS voorraad (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT UNSIGNED NOT NULL,
+    hoeveelheid INT NOT NULL DEFAULT 0,
+    minimum_voorraad INT NOT NULL DEFAULT 0,
+    locatie VARCHAR(100) NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    CONSTRAINT fk_voorraad_product
+        FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE,
+    CONSTRAINT uk_voorraad_product UNIQUE (product_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS klanten (
@@ -205,7 +234,7 @@ CREATE TABLE IF NOT EXISTS pakket_product (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------
--- 3) Demo data
+-- 3) Demo Data
 -- ------------------------------------------
 -- Wachtwoord voor alle demo-users: Wachtwoord123!
 
@@ -245,8 +274,7 @@ VALUES
     ('Soepen, sauzen, kruiden en olie', NOW(), NOW()),
     ('Snoep, koek, chips en chocolade', NOW(), NOW()),
     ('Baby, verzorging en hygiëne', NOW(), NOW())
-ON DUPLICATE KEY UPDATE
-    updated_at = NOW();
+ON DUPLICATE KEY UPDATE updated_at = NOW();
 
 INSERT INTO wens_allergies (beschrijving, created_at, updated_at)
 VALUES
@@ -258,92 +286,67 @@ VALUES
     ('Lactose', NOW(), NOW()),
     ('Veganistisch', NOW(), NOW()),
     ('Vegetarisch', NOW(), NOW())
+ON DUPLICATE KEY UPDATE updated_at = NOW();
+
+INSERT INTO leveranciers (bedrijfsnaam, adres, contactpersoon_naam, contactpersoon_email, telefoonnummer, volgende_levering, created_at, updated_at)
+VALUES
+    ('SuperFood BV', 'Straat 12, Utrecht', 'Jan de Vries', 'info@superfood.nl', '030-1234567', '2024-10-05 09:00:00', NOW(), NOW()),
+    ('Groente & Fruit NV', 'Marktplein 5, Breukelen', 'Sanne Bakker', 'contact@grof.nl', '0346-765432', '2024-10-15 09:00:00', NOW(), NOW()),
+    ('Bakkerij De Zoete', 'Bakkerstraat 1, Utrecht', 'Pieter de Zoete', 'bakker@dezoete.nl', '030-9876543', '2024-10-20 08:00:00', NOW(), NOW())
 ON DUPLICATE KEY UPDATE
+    adres = VALUES(adres),
+    contactpersoon_naam = VALUES(contactpersoon_naam),
+    contactpersoon_email = VALUES(contactpersoon_email),
+    telefoonnummer = VALUES(telefoonnummer),
+    volgende_levering = VALUES(volgende_levering),
     updated_at = NOW();
-
-INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
-SELECT 'Familie Jansen', 'Dorpsstraat 12, Maaskantje', '06-11111111', 'jansen@voorbeeld.nl', 'Geen varkensvlees', 2, 2, 0, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Jansen' AND telefoonnummer = '06-11111111'
-);
-
-INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
-SELECT 'Familie De Vries', 'Molenweg 8, Maaskantje', '06-22222222', 'devries@voorbeeld.nl', 'Lactose', 1, 3, 1, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie De Vries' AND telefoonnummer = '06-22222222'
-);
-
-INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
-SELECT 'Familie Bakker', 'Stationslaan 21, Maaskantje', '06-33333333', 'bakker@voorbeeld.nl', 'Gluten', 2, 1, 0, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Bakker' AND telefoonnummer = '06-33333333'
-);
-
-INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
-SELECT 'Familie El Idrissi', 'Waterweg 4, Maaskantje', '06-44444444', 'elidrissi@voorbeeld.nl', 'Vegetarisch', 2, 2, 1, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie El Idrissi' AND telefoonnummer = '06-44444444'
-);
-
-INSERT INTO klanten (gezinsnaam, adres, telefoonnummer, emailadres, allergieen, aantal_volwassenen, aantal_kinderen, aantal_babys, created_at, updated_at)
-SELECT 'Familie Van Dijk', 'Kerkstraat 2, Maaskantje', '06-55555555', 'vandijk@voorbeeld.nl', 'Pinda''s', 1, 1, 0, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM klanten WHERE gezinsnaam = 'Familie Van Dijk' AND telefoonnummer = '06-55555555'
-);
-
-INSERT INTO klant_wens (klant_id, wens_id)
-SELECT k.id, w.id
-FROM klanten AS k
-JOIN wens_allergies AS w ON w.beschrijving = 'Geen varkensvlees'
-WHERE k.gezinsnaam = 'Familie Jansen'
-    AND NOT EXISTS (
-        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
-    );
-
-INSERT INTO klant_wens (klant_id, wens_id)
-SELECT k.id, w.id
-FROM klanten AS k
-JOIN wens_allergies AS w ON w.beschrijving = 'Lactose'
-WHERE k.gezinsnaam = 'Familie De Vries'
-    AND NOT EXISTS (
-        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
-    );
-
-INSERT INTO klant_wens (klant_id, wens_id)
-SELECT k.id, w.id
-FROM klanten AS k
-JOIN wens_allergies AS w ON w.beschrijving = 'Gluten'
-WHERE k.gezinsnaam = 'Familie Bakker'
-    AND NOT EXISTS (
-        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
-    );
-
-INSERT INTO klant_wens (klant_id, wens_id)
-SELECT k.id, w.id
-FROM klanten AS k
-JOIN wens_allergies AS w ON w.beschrijving = 'Vegetarisch'
-WHERE k.gezinsnaam = 'Familie El Idrissi'
-    AND NOT EXISTS (
-        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
-    );
-
-INSERT INTO klant_wens (klant_id, wens_id)
-SELECT k.id, w.id
-FROM klanten AS k
-JOIN wens_allergies AS w ON w.beschrijving = 'Pinda''s'
-WHERE k.gezinsnaam = 'Familie Van Dijk'
-    AND NOT EXISTS (
-        SELECT 1 FROM klant_wens kw WHERE kw.klant_id = k.id AND kw.wens_id = w.id
-    );
 
 INSERT INTO products (productnaam, ean_nummer, aantal_in_voorraad, categorie_id, leverancier_id, created_at, updated_at)
 VALUES
-    ('Appels Elstar (1kg)', '8710400000001', 50, (SELECT id FROM categories WHERE naam = 'Aardappelen, groente, fruit' LIMIT 1), NULL, NOW(), NOW()),
-    ('Jong Belegen Kaas (400g)', '8710400000002', 20, (SELECT id FROM categories WHERE naam = 'Kaas, vleeswaren' LIMIT 1), NULL, NOW(), NOW()),
-    ('Halfvolle Melk (1L)', '8710400000003', 100, (SELECT id FROM categories WHERE naam = 'Zuivel, plantaardig en eieren' LIMIT 1), NULL, NOW(), NOW())
+    ('Appels Elstar (1kg)', '8710400000001', 50, (SELECT id FROM categories WHERE naam = 'Aardappelen, groente, fruit' LIMIT 1), (SELECT id FROM leveranciers WHERE bedrijfsnaam = 'Groente & Fruit NV' LIMIT 1), NOW(), NOW()),
+    ('Jong Belegen Kaas (400g)', '8710400000002', 20, (SELECT id FROM categories WHERE naam = 'Kaas, vleeswaren' LIMIT 1), (SELECT id FROM leveranciers WHERE bedrijfsnaam = 'SuperFood BV' LIMIT 1), NOW(), NOW()),
+    ('Halfvolle Melk (1L)', '8710400000003', 100, (SELECT id FROM categories WHERE naam = 'Zuivel, plantaardig en eieren' LIMIT 1), (SELECT id FROM leveranciers WHERE bedrijfsnaam = 'SuperFood BV' LIMIT 1), NOW(), NOW()),
+    ('Volkoren Brood', '8710400000004', 35, (SELECT id FROM categories WHERE naam = 'Bakkerij en banket' LIMIT 1), (SELECT id FROM leveranciers WHERE bedrijfsnaam = 'Bakkerij De Zoete' LIMIT 1), NOW(), NOW())
 ON DUPLICATE KEY UPDATE
     productnaam = VALUES(productnaam),
     aantal_in_voorraad = VALUES(aantal_in_voorraad),
     categorie_id = VALUES(categorie_id),
     leverancier_id = VALUES(leverancier_id),
     updated_at = NOW();
+
+INSERT INTO leverancier_products (leverancier_id, product_id, created_at, updated_at)
+SELECT l.id, p.id, NOW(), NOW()
+FROM leveranciers l
+JOIN products p ON (
+    (l.bedrijfsnaam = 'Groente & Fruit NV' AND p.ean_nummer = '8710400000001') OR
+    (l.bedrijfsnaam = 'SuperFood BV' AND p.ean_nummer IN ('8710400000002', '8710400000003')) OR
+    (l.bedrijfsnaam = 'Bakkerij De Zoete' AND p.ean_nummer = '8710400000004')
+)
+WHERE NOT EXISTS (
+    SELECT 1 FROM leverancier_products lp
+    WHERE lp.leverancier_id = l.id AND lp.product_id = p.id
+);
+
+INSERT INTO voorraad (product_id, hoeveelheid, minimum_voorraad, locatie, created_at, updated_at)
+SELECT p.id, 20, 10, 'Stelling A', NOW(), NOW()
+FROM products p
+WHERE p.ean_nummer = '8710400000001'
+  AND NOT EXISTS (SELECT 1 FROM voorraad v WHERE v.product_id = p.id);
+
+INSERT INTO voorraad (product_id, hoeveelheid, minimum_voorraad, locatie, created_at, updated_at)
+SELECT p.id, 5, 10, 'Koeling 1', NOW(), NOW()
+FROM products p
+WHERE p.ean_nummer = '8710400000002'
+  AND NOT EXISTS (SELECT 1 FROM voorraad v WHERE v.product_id = p.id);
+
+INSERT INTO voorraad (product_id, hoeveelheid, minimum_voorraad, locatie, created_at, updated_at)
+SELECT p.id, 30, 8, 'Zuivel rek', NOW(), NOW()
+FROM products p
+WHERE p.ean_nummer = '8710400000003'
+  AND NOT EXISTS (SELECT 1 FROM voorraad v WHERE v.product_id = p.id);
+
+INSERT INTO voorraad (product_id, hoeveelheid, minimum_voorraad, locatie, created_at, updated_at)
+SELECT p.id, 12, 6, 'Broodrek', NOW(), NOW()
+FROM products p
+WHERE p.ean_nummer = '8710400000004'
+  AND NOT EXISTS (SELECT 1 FROM voorraad v WHERE v.product_id = p.id);

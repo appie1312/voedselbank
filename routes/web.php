@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
+
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
@@ -24,6 +27,24 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/leveranciers', [LeverancierController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('leveranciers.index');
+    Route::get('/voorraad', [VoorraadController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('voorraad');
+    Route::get('/voorraad/nieuw', [VoorraadController::class, 'create'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.create');
+    Route::post('/voorraad', [VoorraadController::class, 'store'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.store');
+    Route::get('/voorraad/{productId}/wijzig', [VoorraadController::class, 'edit'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.edit');
+    Route::put('/voorraad/{productId}', [VoorraadController::class, 'update'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.update');
+    Route::delete('/voorraad/{productId}', [VoorraadController::class, 'destroy'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('voorraad.destroy');
     Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
         ->middleware('role:directie,magazijn_medewerker')
         ->name('leveranciers.create');
