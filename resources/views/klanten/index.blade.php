@@ -69,7 +69,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if ($klanten->isEmpty())
+                        @if (isset($status_error))
+                            <tr>
+                                <td colspan="7">Door een storing kunnen klanten nu niet worden weergegeven.</td>
+                            </tr>
+                            @for ($index = 0; $index < $vasteRijen - 1; $index++)
+                                <tr class="table-light">
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                            @endfor
+                        @elseif ($klanten->isEmpty())
                             <tr>
                                 <td colspan="7">Geen klanten gevonden.</td>
                             </tr>

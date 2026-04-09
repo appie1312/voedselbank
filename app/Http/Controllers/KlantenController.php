@@ -29,7 +29,7 @@ class KlantenController extends Controller
             ];
 
             $klanten = Klant::haalOverzichtViaStoredProcedure($zoekterm, $aantalRijen);
-            $statusSuccess = 'Overzicht geladen: '.$klanten->count().' klant(en) (max '.$aantalRijen.' rij(en)).';
+            $statusSuccess = 'Klantenoverzicht is succesvol geladen.';
 
             Log::info('Technische log: directie klantenoverzicht geladen.', [
                 'user_id' => $request->user()?->id,
@@ -47,7 +47,7 @@ class KlantenController extends Controller
             return view('klanten.index', [
                 'klanten' => $klanten,
                 'filters' => $filters,
-                'status_error' => 'Klantenoverzicht kon niet geladen worden. Controleer de technische log.',
+                'status_error' => 'Er is een storing. Daardoor worden er momenteel geen klanten getoond.',
             ]);
         }
 
