@@ -6891,3 +6891,12 @@
 #44 C:/Proef examen/voedselbank-maaskantje/artisan(16): Illuminate/Foundation/Application->handleCommand(Object(Symfony/Component/Console/Input/ArgvInput))
 #45 {main}
 "} 
+[2026-04-09 11:36:17] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/leveranciers"} 
+[2026-04-09 11:36:17] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/leveranciers"} 
+[2026-04-09 11:36:24] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/voorraad"} 
+[2026-04-09 11:36:28] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/voorraad"} 
+[2026-04-09 11:36:43] local.INFO: Technische log: profielpagina geladen. {"user_id":1} 
+[2026-04-09 11:37:52] local.INFO: Technische log: inloggen gelukt. {"user_id":1,"email":"directie@voedselbank.local"} 
+[2026-04-09 11:37:52] local.INFO: Technische log: directie dashboard geladen. {"user_id":1,"accounts_totaal":3} 
+[2026-04-09 11:39:32] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/leveranciers"} 
+[2026-04-09 11:39:38] local.WARNING: Technische log: toegang geweigerd op rol. {"user_id":1,"role_user":"directie","toegestaan":["vrijwilliger"],"url":"http://voedselbank-maaskantje.test/leveranciers"} 

@@ -23,7 +23,6 @@ class VoorraadController extends Controller
             $melding = '';
 
             if ($voorraad === false) {
-                $melding = 'Er is een fout opgetreden bij het laden van de voorraad.';
                 $voorraad = [];
             } elseif (count($voorraad) === 0) {
                 $melding = 'Er is momenteel geen voorraad beschikbaar.';
@@ -35,7 +34,7 @@ class VoorraadController extends Controller
 
             return view('voorraad.index', [
                 'voorraad' => [],
-                'melding' => 'Er is een fout opgetreden bij het laden van de voorraad.',
+                'melding' => '',
             ]);
         }
     }

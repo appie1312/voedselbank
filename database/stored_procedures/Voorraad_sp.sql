@@ -1,11 +1,12 @@
 DROP PROCEDURE IF EXISTS spGetVoorraadOverzicht;
 
+use voedselbank_maaskantje;
 DELIMITER $$
 
 CREATE PROCEDURE spGetVoorraadOverzicht()
 BEGIN
     SELECT
-        p.naam AS product_naam,
+        p.productnaam AS product_naam,
         c.naam AS categorie_naam,
         v.hoeveelheid,
         v.locatie,
@@ -17,7 +18,7 @@ BEGIN
     FROM voorraad v
     INNER JOIN products p ON v.product_id = p.id
     INNER JOIN categories c ON p.categorie_id = c.id
-    ORDER BY p.naam ASC;
+    ORDER BY p.productnaam ASC;
 END $$
 
 DELIMITER ;

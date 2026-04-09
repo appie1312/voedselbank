@@ -27,6 +27,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/leveranciers', [LeverancierController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('leveranciers.index');
+    Route::get('/voorraad', [VoorraadController::class, 'index'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('voorraad');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
@@ -46,7 +49,6 @@ Route::middleware('auth')->group(function (): void {
     });
 
     Route::middleware('role:vrijwilliger')->group(function (): void {
-        Route::get('/voorraad', [VoorraadController::class, 'index'])->name('voorraad');
                 Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
         // Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
 
