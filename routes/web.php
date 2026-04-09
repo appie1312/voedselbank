@@ -3,11 +3,9 @@
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VoorraadController;
 use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
