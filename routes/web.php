@@ -3,11 +3,10 @@
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\VoorraadController;
+use App\Http\Controllers\VoedselpakketController;
 use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +61,15 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
+        // Volledige voedselpakketflow voor directie.
+        Route::get('/directie/voedselpakketten', [VoedselpakketController::class, 'index'])->name('directie.voedselpakketten.index');
+        Route::get('/directie/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('directie.voedselpakketten.create');
+        Route::post('/directie/voedselpakketten', [VoedselpakketController::class, 'store'])->name('directie.voedselpakketten.store');
+        Route::get('/directie/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('directie.voedselpakketten.edit');
+        Route::get('/directie/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'samenstellen'])->name('directie.voedselpakketten.samenstellen');
+        Route::post('/directie/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'opslaanSamenstelling'])->name('directie.voedselpakketten.samenstellen.opslaan');
+        Route::put('/directie/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('directie.voedselpakketten.update');
+        Route::delete('/directie/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('directie.voedselpakketten.destroy');
         Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
         Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
         Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
@@ -74,24 +82,30 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
         Route::get('/magazijn/dashboard', [DashboardController::class, 'magazijn'])->name('magazijn.dashboard');
-        Route::get('/magazijn/voedselpakketten', [VoedselpakketController::class, 'index'])->name('Magazijn.voedselpakketten.index');
-        Route::get('/magazijn/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('Magazijn.voedselpakketten.create');
-        Route::post('/magazijn/voedselpakketten', [VoedselpakketController::class, 'store'])->name('Magazijn.voedselpakketten.store');
-        Route::get('/magazijn/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('Magazijn.voedselpakketten.edit');
-        Route::put('/magazijn/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('Magazijn.voedselpakketten.update');
-        Route::delete('/magazijn/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('Magazijn.voedselpakketten.destroy');
+        // Volledige voedselpakketflow voor magazijn.
+        Route::get('/magazijn/voedselpakketten', [VoedselpakketController::class, 'index'])->name('magazijn_medewerker.voedselpakketten.index');
+        Route::get('/magazijn/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('magazijn_medewerker.voedselpakketten.create');
+        Route::post('/magazijn/voedselpakketten', [VoedselpakketController::class, 'store'])->name('magazijn_medewerker.voedselpakketten.store');
+        Route::get('/magazijn/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('magazijn_medewerker.voedselpakketten.edit');
+        Route::get('/magazijn/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'samenstellen'])->name('magazijn_medewerker.voedselpakketten.samenstellen');
+        Route::post('/magazijn/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'opslaanSamenstelling'])->name('magazijn_medewerker.voedselpakketten.samenstellen.opslaan');
+        Route::put('/magazijn/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('magazijn_medewerker.voedselpakketten.update');
+        Route::delete('/magazijn/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('magazijn_medewerker.voedselpakketten.destroy');
     
 
     });
 
     Route::middleware('role:vrijwilliger')->group(function (): void {
         Route::get('/vrijwilliger/dashboard', [DashboardController::class, 'vrijwilliger'])->name('vrijwilliger.dashboard');
-        Route::get('/vrijwilliger/voedselpakketten', [VoedselpakketController::class, 'index'])->name('Vrijwilliger.voedselpakketten.index');
-        Route::get('/vrijwilliger/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('Vrijwilliger.voedselpakketten.create');
-        Route::post('/vrijwilliger/voedselpakketten', [VoedselpakketController::class, 'store'])->name('Vrijwilliger.voedselpakketten.store');
-        Route::get('/vrijwilliger/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('Vrijwilliger.voedselpakketten.edit');
-        Route::put('/vrijwilliger/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('Vrijwilliger.voedselpakketten.update');
-        Route::delete('/vrijwilliger/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('Vrijwilliger.voedselpakketten.destroy');
+        // Volledige voedselpakketflow voor vrijwilligers.
+        Route::get('/vrijwilliger/voedselpakketten', [VoedselpakketController::class, 'index'])->name('vrijwilliger.voedselpakketten.index');
+        Route::get('/vrijwilliger/voedselpakketten/create', [VoedselpakketController::class, 'create'])->name('vrijwilliger.voedselpakketten.create');
+        Route::post('/vrijwilliger/voedselpakketten', [VoedselpakketController::class, 'store'])->name('vrijwilliger.voedselpakketten.store');
+        Route::get('/vrijwilliger/voedselpakketten/{id}/edit', [VoedselpakketController::class, 'edit'])->name('vrijwilliger.voedselpakketten.edit');
+        Route::get('/vrijwilliger/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'samenstellen'])->name('vrijwilliger.voedselpakketten.samenstellen');
+        Route::post('/vrijwilliger/voedselpakketten/{id}/samenstellen', [VoedselpakketController::class, 'opslaanSamenstelling'])->name('vrijwilliger.voedselpakketten.samenstellen.opslaan');
+        Route::put('/vrijwilliger/voedselpakketten/{id}', [VoedselpakketController::class, 'update'])->name('vrijwilliger.voedselpakketten.update');
+        Route::delete('/vrijwilliger/voedselpakketten/{id}', [VoedselpakketController::class, 'destroy'])->name('vrijwilliger.voedselpakketten.destroy');
 
         
 
