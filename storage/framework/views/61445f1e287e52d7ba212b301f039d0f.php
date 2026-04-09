@@ -1,7 +1,24 @@
 ﻿<footer class="bg-white border-top mt-auto py-3">
     <div class="container d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+<<<<<<< HEAD
+        <a href=social_links.facebook class="text-decoration-none text-secondary" target="_blank">
+            <div class="fw-semibold text-success">Voedselbank Maaskantje</div>
+        <small class="text-secondary">Samen helpen we gezinnen met voedselhulp en waardigheid.</small>
+            <i class="bi bi-facebook"></i> Facebook
+        </a>
+        <a href=social_links.instagram class="text-decoration-none text-secondary" target="_blank
+            "><i class="bi bi-instagram"></i> Instagram</a>
+        <a href=social_links.linkedin class="text-decoration-none text-secondary" target="_blank
+            "><i class="bi bi-linkedin"></i> LinkedIn</a>
+        <a href=social_links.twitter class="text-decoration-none text-secondary" target="_blank
+            "><i class="bi bi-twitter"></i> Twitter</a>
+        <a href=social_links.youtube class="text-decoration-none text-secondary" target="_blank
+            "><i class="bi bi-youtube"></i> YouTube</a>
+            alle rechten voorbehouden &copy; <?php echo e(date('Y')); ?> Voedselbank Maaskantje
+=======
         <div class="fw-semibold text-success">Voedselbank Maaskantje</div>
         <small class="text-secondary">Samen helpen we gezinnen met voedselhulp en waardigheid.</small>
+>>>>>>> 49b7a9e1d147f3414d7c2a98dea1b09a3d7ceca6
     </div>
 </footer>
 <?php /**PATH C:\Proef examen\voedselbank-maaskantje\resources\views/components/footer.blade.php ENDPATH**/ ?>

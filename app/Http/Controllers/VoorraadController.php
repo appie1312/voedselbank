@@ -1,16 +1,24 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Http\Controllers;
 
 use App\Models\VoorraadModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
-class VoorraadController
+class VoorraadController extends Controller
 {
     private $voorraadModel;
 
-    public function __construct($db)
+    /**
+     * In Laravel gebruiken we Dependency Injection of Facades
+     * in plaats van handmatige DB connecties in de constructor.
+     */
+    public function __construct()
     {
-        $this->voorraadModel = new VoorraadModel($db);
+        // We halen de PDO connectie uit de Laravel DB facade
+        $this->voorraadModel = new VoorraadModel(DB::connection()->getPdo());
     }
 
     /**
@@ -18,18 +26,24 @@ class VoorraadController
      */
     public function index()
     {
-        $voorraad = $this->voorraadModel->getVoorraadLijst();
-        $melding = "";
+        try {
+            $voorraad = $this->voorraadModel->getVoorraadLijst();
+            $melding = "";
 
-        // Validatie van data-ontvangst en bepalen van feedback meldingen
-        if ($voorraad === false) {
-            $melding = "Er is een technische fout opgetreden bij het laden van de voorraad.";
-            $voorraad = [];
-        } elseif (empty($voorraad)) {
-            $melding = "Er is momenteel geen voorraad beschikbaar.";
+            if ($voorraad === false) {
+                $melding = "Er is een fout opgetreden bij het laden van de voorraad.";
+                $voorraad = [];
+            } elseif (count($voorraad) === 0) {
+                $melding = "Er is momenteel geen voorraad beschikbaar.";
+            }
+
+            // In Laravel gebruiken we view() helper, verwijder de 'require_once'
+            return view('voorraad.index', compact('voorraad', 'melding'));
+
+        } catch (Exception $e) {
+            // Technische log via Laravel Log
+            logger()->error("Fout in VoorraadController: " . $e->getMessage());
+            return back()->with('error', 'Er is iets misgegaan.');
         }
-
-        // View laden (data wordt meegegeven)
-        require_once '../app/views/voorraad/index.php';
     }
 }

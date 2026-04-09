@@ -1,23 +1,33 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <h1>Voorraadoverzicht</h1>
+<!-- resources/views/voorraad/index.blade.php -->
 <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
     <title>Voorraadoverzicht - Voedselbank Maaskantje</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .alert { padding: 15px; background-color: #f8d7da; color: #721c24; margin-bottom: 20px; }
+        .warning { background-color: #fff3cd; color: #856404; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    </style>
 </head>
 <body>
 
-    <h1>Overzicht Voorraad</h1>
 
-    <!-- Terugkoppeling aan eindgebruiker -->
-    <?php if (!empty($melding)): ?>
+    {{-- Feedback melding aan eindgebruiker --}}
+    @if (!empty($melding))
         <div class="alert">
-            <p><strong>Melding:</strong> <?php echo htmlspecialchars($melding); ?></p>
+            <p><strong>Melding:</strong> {{ $melding }}</p>
         </div>
-    <?php endif; ?>
+    @endif
 
-    <?php if (!empty($voorraad)): ?>
-        <table border="1">
+    @if (count($voorraad) > 0)
+        <table>
             <thead>
                 <tr>
                     <th>Product</th>
@@ -28,20 +38,20 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($voorraad as $item): ?>
-                    <tr class="<?php echo ($item->status == 'Aanvullen') ? 'warning' : ''; ?>">
-                        <td><?php echo htmlspecialchars($item->product_naam); ?></td>
-                        <td><?php echo htmlspecialchars($item->categorie_naam); ?></td>
-                        <td><?php echo htmlspecialchars($item->hoeveelheid); ?></td>
-                        <td><?php echo htmlspecialchars($item->locatie); ?></td>
-                        <td>
-                            <strong><?php echo htmlspecialchars($item->status); ?></strong>
-                        </td>
+                @foreach ($voorraad as $item)
+                    <tr class="{{ $item->status == 'Aanvullen' ? 'warning' : '' }}">
+                        <td>{{ $item->product_naam }}</td>
+                        <td>{{ $item->categorie_naam }}</td>
+                        <td>{{ $item->hoeveelheid }}</td>
+                        <td>{{ $item->locatie }}</td>
+                        <td>{{ $item->status }}</td>
                     </tr>
-                <?php endforeach; ?>
+                @endforeach
             </tbody>
         </table>
-    <?php endif; ?>
+    @endif
 
 </body>
 </html>
+
+@endsection
