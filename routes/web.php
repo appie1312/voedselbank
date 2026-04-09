@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +26,8 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
-        Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
+        Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
     });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
