@@ -1,0 +1,57 @@
+﻿.hero {
+    background: linear-gradient(140deg, #e7f7f3, #ecfccb);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 12px 30px rgba(15, 118, 110, 0.12);
+}
+
+.hero h1 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.hero p {
+    margin-top: 0;
+    color: #374151;
+    max-width: 780px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.grid-info {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.info-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    border-top: 5px solid #0f766e;
+    box-shadow: 0 6px 16px rgba(2, 6, 23, 0.08);
+}
+
+.info-card h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.info-card p {
+    margin: 0;
+    color: #4b5563;
+}
+
+@media (max-width: 900px) {
+    .grid-info {
+        grid-template-columns: 1fr;
+    }
+}
+

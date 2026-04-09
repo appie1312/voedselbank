@@ -1,0 +1,40 @@
+<?php
+
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', [DashboardController::class, 'home'])->name('home');
+Route::get('/voorraad', [DashboardController::class, 'voorraad'])->name('voorraad');
+
+Route::middleware('guest')->group(function (): void {
+    Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/inloggen', [AuthController::class, 'login'])->name('login.attempt');
+
+    Route::get('/registreren', [AuthController::class, 'showRegisterForm'])->name('register.form');
+    Route::post('/registreren', [AuthController::class, 'register'])->name('register');
+});
+
+Route::middleware('auth')->group(function (): void {
+    Route::post('/uitloggen', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', [DashboardController::class, 'redirectByRole'])->name('dashboard.redirect');
+
+    Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::middleware('role:directie')->group(function (): void {
+        Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
+        Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
+    });
+
+    Route::middleware('role:magazijn_medewerker')->group(function (): void {
+        Route::get('/magazijn/dashboard', [DashboardController::class, 'magazijn'])->name('magazijn.dashboard');
+    });
+
+    Route::middleware('role:vrijwilliger')->group(function (): void {
+        Route::get('/vrijwilliger/dashboard', [DashboardController::class, 'vrijwilliger'])->name('vrijwilliger.dashboard');
+    });
+});

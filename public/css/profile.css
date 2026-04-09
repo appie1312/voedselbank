@@ -1,0 +1,43 @@
+﻿.profile-card {
+    max-width: 760px;
+    background: #ffffff;
+    margin: 0 auto;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+}
+
+.profile-card h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.profile-card p {
+    margin-top: 0;
+    color: #4b5563;
+}
+
+.profile-form {
+    display: grid;
+    gap: 8px;
+}
+
+.profile-form label {
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.profile-form input,
+.profile-form textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px;
+    font: inherit;
+    background: #f9fafb;
+}
+
+.profile-form button {
+    margin-top: 12px;
+}
+
