@@ -25,6 +25,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/leveranciers', [LeverancierController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('leveranciers.index');
+    Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.create');
+    Route::post('/leveranciers', [LeverancierController::class, 'store'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.store');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');

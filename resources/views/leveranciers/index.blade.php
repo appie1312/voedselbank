@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1>Leveranciers</h1>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="mb-0">Leveranciers</h1>
+        <a href="{{ route('leveranciers.create') }}" class="btn btn-primary">Nieuwe leverancier</a>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -57,6 +60,5 @@
         </table>
     </div>
 
-    {{-- <a href="{{ route('leveranciers.create') }}" class="btn btn-primary mt-3">Nieuwe leverancier toevoegen</a> --}}
 </div>
 @endsection
