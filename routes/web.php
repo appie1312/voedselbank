@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'home'])->name('home');
+Route::get('/voorraad', [DashboardController::class, 'voorraad'])->name('voorraad');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/inloggen', [AuthController::class, 'showLoginForm'])->name('login');
