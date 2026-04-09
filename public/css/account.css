@@ -1,0 +1,32 @@
+﻿.account-header {
+    margin-bottom: 12px;
+}
+
+.table-wrap {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    padding: 10px;
+    white-space: nowrap;
+}
+
+th {
+    background: #f0fdf4;
+}
+

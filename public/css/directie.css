@@ -1,0 +1,80 @@
+﻿.dashboard-header {
+    margin-bottom: 14px;
+}
+
+.dashboard-header h1 {
+    margin-bottom: 4px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.stat {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.stat h2 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.stat strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 1.7rem;
+    color: #14532d;
+}
+
+.table-wrap {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.table-wrap h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    padding: 10px;
+    white-space: nowrap;
+}
+
+th {
+    background: #f0fdf4;
+}
+
+@media (max-width: 920px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 540px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
