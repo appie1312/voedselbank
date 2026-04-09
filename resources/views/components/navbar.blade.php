@@ -33,6 +33,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('klanten.index') }}">Klanten</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('allergieen.index') }}">Allergieen</a>
+                        </li>
                     @endif
 
                     <li class="nav-item ms-lg-2">
