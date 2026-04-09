@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\KlantOverzichtRequest;
 use App\Http\Requests\KlantToevoegenRequest;
+use App\Http\Requests\KlantVerwijderenRequest;
 use App\Http\Requests\KlantWijzigenRequest;
 use App\Models\Klant;
 use Illuminate\Http\RedirectResponse;
@@ -177,5 +178,50 @@ class KlantenController extends Controller
             'klanten' => $klanten,
             'filters' => $filters,
         ]);
+    }
+
+    public function destroy(KlantVerwijderenRequest $request, int $klantId): RedirectResponse
+    {
+        try {
+            $request->validated();
+            $resultaat = Klant::verwijderViaStoredProcedure($klantId);
+
+            if (! $resultaat['klant_bestaat']) {
+                return redirect()
+                    ->route('klanten.index')
+                    ->with('status_error', 'Deze klant kon niet worden gevonden.');
+            }
+
+            if ($resultaat['aanwezig']) {
+                Log::warning('Technische log: klant verwijderen geblokkeerd wegens aanwezigheid binnen land.', [
+                    'user_id' => $request->user()?->id,
+                    'klant_id' => $klantId,
+                ]);
+
+                return redirect()
+                    ->route('klanten.index')
+                    ->with('status_error', 'De klant kan niet worden verwijderd omdat hij/zij aanwezig is');
+            }
+
+            Log::info('Technische log: klant succesvol verwijderd.', [
+                'user_id' => $request->user()?->id,
+                'klant_id' => $klantId,
+            ]);
+
+            return redirect()
+                ->route('klanten.index')
+                ->with('status_success', 'De klant is succesvol verwijderd');
+        } catch (Throwable $exception) {
+            Log::error('Technische log: klant verwijderen mislukt.', [
+                'user_id' => $request->user()?->id,
+                'klant_id' => $klantId,
+                'error_class' => $exception::class,
+                'error_message' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('klanten.index')
+                ->with('status_error', 'Er is een storing. De klant kon niet worden verwijderd.');
+        }
     }
 }
