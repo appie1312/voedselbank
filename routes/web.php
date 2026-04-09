@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -31,6 +30,8 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/directie/klanten', [KlantenController::class, 'index'])->name('klanten.index');
         Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
         Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
+        Route::get('/directie/klanten/{klantId}/wijzig', [KlantenController::class, 'edit'])->name('klanten.edit');
+        Route::put('/directie/klanten/{klantId}', [KlantenController::class, 'update'])->name('klanten.update');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
         Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });

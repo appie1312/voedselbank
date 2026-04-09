@@ -59,6 +59,77 @@ class Klant extends Model
         ];
     }
 
+    public static function haalKlantVoorWijzigen(int $klantId): ?object
+    {
+        return DB::table('klanten as k')
+            ->leftJoin('voedselpakketten as vp', 'vp.klant_id', '=', 'k.id')
+            ->leftJoin('klant_wens as kw', 'kw.klant_id', '=', 'k.id')
+            ->leftJoin('wens_allergies as wa', 'wa.id', '=', 'kw.wens_id')
+            ->where('k.id', $klantId)
+            ->groupBy([
+                'k.id',
+                'k.gezinsnaam',
+                'k.adres',
+                'k.telefoonnummer',
+                'k.emailadres',
+                'k.aantal_volwassenen',
+                'k.aantal_kinderen',
+                'k.aantal_babys',
+            ])
+            ->select([
+                'k.id',
+                'k.gezinsnaam',
+                'k.adres',
+                'k.telefoonnummer',
+                'k.emailadres',
+                'k.aantal_volwassenen',
+                'k.aantal_kinderen',
+                'k.aantal_babys',
+                DB::raw('COUNT(DISTINCT vp.id) AS totaal_voedselpakketten'),
+                DB::raw("GROUP_CONCAT(DISTINCT wa.beschrijving ORDER BY wa.beschrijving SEPARATOR ', ') AS wensen_allergieen"),
+            ])
+            ->first();
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array{gewijzigd: bool, bestaat_email_al: bool, klant_bestaat: bool}
+     */
+    public static function wijzigViaStoredProcedure(int $klantId, array $attributes): array
+    {
+        $payload = [
+            $klantId,
+            trim((string) $attributes['gezinsnaam']),
+            trim((string) $attributes['adres']),
+            trim((string) $attributes['telefoonnummer']),
+            ($attributes['emailadres'] ?? null) === null ? null : trim((string) $attributes['emailadres']),
+            (int) $attributes['aantal_volwassenen'],
+            (int) $attributes['aantal_kinderen'],
+            (int) $attributes['aantal_babys'],
+        ];
+
+        try {
+            $resultaat = DB::select(
+                'CALL sp_klant_wijzigen(?, ?, ?, ?, ?, ?, ?, ?)',
+                $payload
+            );
+        } catch (QueryException $exception) {
+            if (! str_contains(strtolower($exception->getMessage()), 'sp_klant_wijzigen')) {
+                throw $exception;
+            }
+
+            return self::wijzigViaQuery($klantId, $attributes);
+        }
+
+        $eersteRij = $resultaat[0] ?? null;
+
+        return [
+            'gewijzigd' => ((int) ($eersteRij->gewijzigd ?? 0)) === 1,
+            'bestaat_email_al' => ((int) ($eersteRij->bestaat_email_al ?? $eersteRij->bestaat_al ?? 0)) === 1,
+            'klant_bestaat' => ((int) ($eersteRij->klant_bestaat ?? 0)) === 1,
+        ];
+    }
+
     public static function haalOverzichtViaStoredProcedure(?string $zoekterm, int $aantalRijen): Collection
     {
         $veiligeZoekterm = trim((string) $zoekterm);
@@ -169,6 +240,60 @@ class Klant extends Model
             'toegevoegd' => true,
             'bestaat_al' => false,
             'klant_id' => $klantId,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array{gewijzigd: bool, bestaat_email_al: bool, klant_bestaat: bool}
+     */
+    private static function wijzigViaQuery(int $klantId, array $attributes): array
+    {
+        $klantBestaat = DB::table('klanten')->where('id', $klantId)->exists();
+
+        if (! $klantBestaat) {
+            return [
+                'gewijzigd' => false,
+                'bestaat_email_al' => false,
+                'klant_bestaat' => false,
+            ];
+        }
+
+        $emailadres = trim((string) ($attributes['emailadres'] ?? ''));
+        $emailBestaatAl = false;
+
+        if ($emailadres !== '') {
+            $emailBestaatAl = DB::table('klanten')
+                ->where('id', '!=', $klantId)
+                ->where('emailadres', $emailadres)
+                ->exists();
+        }
+
+        if ($emailBestaatAl) {
+            return [
+                'gewijzigd' => false,
+                'bestaat_email_al' => true,
+                'klant_bestaat' => true,
+            ];
+        }
+
+        DB::table('klanten')
+            ->where('id', $klantId)
+            ->update([
+                'gezinsnaam' => trim((string) $attributes['gezinsnaam']),
+                'adres' => trim((string) $attributes['adres']),
+                'telefoonnummer' => trim((string) $attributes['telefoonnummer']),
+                'emailadres' => $emailadres === '' ? null : $emailadres,
+                'aantal_volwassenen' => (int) $attributes['aantal_volwassenen'],
+                'aantal_kinderen' => (int) $attributes['aantal_kinderen'],
+                'aantal_babys' => (int) $attributes['aantal_babys'],
+                'updated_at' => now(),
+            ]);
+
+        return [
+            'gewijzigd' => true,
+            'bestaat_email_al' => false,
+            'klant_bestaat' => true,
         ];
     }
 }
