@@ -25,6 +25,12 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/leveranciers', [LeverancierController::class, 'index'])
         ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
         ->name('leveranciers.index');
+    Route::get('/leveranciers/nieuw', [LeverancierController::class, 'create'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.create');
+    Route::post('/leveranciers', [LeverancierController::class, 'store'])
+        ->middleware('role:directie,magazijn_medewerker')
+        ->name('leveranciers.store');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');
@@ -36,7 +42,6 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/directie/klanten/nieuw', [KlantenController::class, 'create'])->name('klanten.create');
         Route::post('/directie/klanten', [KlantenController::class, 'store'])->name('klanten.store');
         Route::get('/directie/accounts', fn () => redirect()->route('klanten.index'))->name('accounts.index');
-        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
