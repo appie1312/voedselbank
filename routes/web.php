@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/leveranciers', [LeverancierController::class, 'store'])
         ->middleware('role:directie,magazijn_medewerker')
         ->name('leveranciers.store');
+    Route::delete('/leveranciers/{leverancierId}', [LeverancierController::class, 'destroy'])
+        ->middleware('role:directie,magazijn_medewerker,vrijwilliger')
+        ->name('leveranciers.destroy');
 
     Route::get('/profiel', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profiel', [ProfileController::class, 'update'])->name('profile.update');

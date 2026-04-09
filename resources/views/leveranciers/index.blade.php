@@ -27,6 +27,7 @@
                     <th>Email Contactpersoon</th>
                     <th>Volgende levering</th>
                     <th>Producten</th>
+                    <th>Acties</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,10 +51,17 @@
                                 -
                             @endif
                         </td>
+                        <td>
+                            <form method="POST" action="{{ route('leveranciers.destroy', $leverancier->id) }}" onsubmit="return confirm('Weet je zeker dat je deze leverancier wilt verwijderen?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">Verwijderen</button>
+                            </form>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center">Geen leveranciers gevonden.</td>
+                        <td colspan="9" class="text-center">Geen leveranciers gevonden.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -76,4 +76,21 @@ class LeverancierController extends Controller
 
         return redirect()->route('leveranciers.index')->with('success', 'Leverancier toegevoegd!');
     }
+
+    public function destroy(int $leverancierId): RedirectResponse
+    {
+        $leverancier = Leverancier::find($leverancierId);
+
+        if (! $leverancier) {
+            return redirect()
+                ->route('leveranciers.index')
+                ->with('error', 'leverancier is al verwijder en kan daarom niet verwijderd worden');
+        }
+
+        $leverancier->delete();
+
+        return redirect()
+            ->route('leveranciers.index')
+            ->with('success', 'leverancier is verwijderd');
+    }
 }
