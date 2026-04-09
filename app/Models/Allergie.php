@@ -15,6 +15,35 @@ class Allergie extends Model
         'beschrijving',
     ];
 
+    /**
+     * @return array{toegevoegd: bool, bestaat_gekoppeld: bool, bestaat_al: bool, klant_bestaat: bool, allergie_id: int|null}
+     */
+    public static function voegToeViaStoredProcedure(int $klantId, string $beschrijving): array
+    {
+        $veiligeBeschrijving = trim($beschrijving);
+
+        try {
+            $resultaat = DB::select('CALL sp_allergie_toevoegen(?, ?)', [$klantId, $veiligeBeschrijving]);
+        } catch (QueryException $exception) {
+            // Veilige fallback als de stored procedure nog niet bestaat.
+            if (! str_contains(strtolower($exception->getMessage()), 'sp_allergie_toevoegen')) {
+                throw $exception;
+            }
+
+            return self::voegToeViaQuery($klantId, $veiligeBeschrijving);
+        }
+
+        $eersteRij = $resultaat[0] ?? null;
+
+        return [
+            'toegevoegd' => ((int) ($eersteRij->toegevoegd ?? 0)) === 1,
+            'bestaat_gekoppeld' => ((int) ($eersteRij->bestaat_gekoppeld ?? 0)) === 1,
+            'bestaat_al' => ((int) ($eersteRij->bestaat_al ?? 0)) === 1,
+            'klant_bestaat' => ((int) ($eersteRij->klant_bestaat ?? 1)) === 1,
+            'allergie_id' => isset($eersteRij->allergie_id) ? (int) $eersteRij->allergie_id : null,
+        ];
+    }
+
     public static function haalOverzichtViaStoredProcedure(?int $klantId, ?string $zoekterm, int $aantalRijen): Collection
     {
         $veiligeKlantId = $klantId !== null && $klantId > 0 ? $klantId : null;
@@ -41,9 +70,9 @@ class Allergie extends Model
 
     private static function haalOverzichtViaJoinQuery(?int $klantId, string $zoekterm, int $aantalRijen): Collection
     {
-        return DB::table('klant_wens as kw')
-            ->join('wens_allergies as wa', 'wa.id', '=', 'kw.wens_id')
-            ->join('klanten as k', 'k.id', '=', 'kw.klant_id')
+        return DB::table('wens_allergies as wa')
+            ->leftJoin('klant_wens as kw', 'kw.wens_id', '=', 'wa.id')
+            ->leftJoin('klanten as k', 'k.id', '=', 'kw.klant_id')
             ->when($klantId !== null, function ($query) use ($klantId): void {
                 $query->where('kw.klant_id', $klantId);
             })
@@ -63,5 +92,71 @@ class Allergie extends Model
             ->orderBy('wa.beschrijving')
             ->limit($aantalRijen)
             ->get();
+    }
+
+    /**
+     * @return array{toegevoegd: bool, bestaat_gekoppeld: bool, bestaat_al: bool, klant_bestaat: bool, allergie_id: int|null}
+     */
+    private static function voegToeViaQuery(int $klantId, string $beschrijving): array
+    {
+        $veiligeBeschrijving = trim($beschrijving);
+        $klantBestaat = DB::table('klanten')->where('id', $klantId)->exists();
+
+        if (! $klantBestaat) {
+            return [
+                'toegevoegd' => false,
+                'bestaat_gekoppeld' => false,
+                'bestaat_al' => false,
+                'klant_bestaat' => false,
+                'allergie_id' => null,
+            ];
+        }
+
+        $bestaandeAllergie = DB::table('wens_allergies')
+            ->whereRaw('LOWER(beschrijving) = LOWER(?)', [$veiligeBeschrijving])
+            ->first(['id']);
+
+        $bestaatAl = true;
+
+        if (! $bestaandeAllergie) {
+            $nieuwAllergieId = (int) DB::table('wens_allergies')->insertGetId([
+                'beschrijving' => $veiligeBeschrijving,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $allergieId = $nieuwAllergieId;
+            $bestaatAl = false;
+        } else {
+            $allergieId = (int) $bestaandeAllergie->id;
+        }
+
+        $bestaatGekoppeld = DB::table('klant_wens')
+            ->where('klant_id', $klantId)
+            ->where('wens_id', $allergieId)
+            ->exists();
+
+        if ($bestaatGekoppeld) {
+            return [
+                'toegevoegd' => false,
+                'bestaat_gekoppeld' => true,
+                'bestaat_al' => $bestaatAl,
+                'klant_bestaat' => true,
+                'allergie_id' => $allergieId,
+            ];
+        }
+
+        DB::table('klant_wens')->insert([
+            'klant_id' => $klantId,
+            'wens_id' => $allergieId,
+        ]);
+
+        return [
+            'toegevoegd' => true,
+            'bestaat_gekoppeld' => false,
+            'bestaat_al' => $bestaatAl,
+            'klant_bestaat' => true,
+            'allergie_id' => $allergieId,
+        ];
     }
 }

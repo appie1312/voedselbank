@@ -18,6 +18,45 @@
                 <a href="{{ route('klanten.index') }}" class="btn btn-outline-secondary">Terug naar klanten</a>
             </div>
 
+            <form method="POST" action="{{ route('allergieen.store') }}" class="row g-3 needs-validation mb-4" novalidate>
+                @csrf
+
+                <div class="col-12 col-lg-3">
+                    <label for="nieuwe_klant_id" class="form-label">Klant ID</label>
+                    <input
+                        id="nieuwe_klant_id"
+                        name="klant_id"
+                        type="number"
+                        class="form-control"
+                        min="1"
+                        value="{{ old('klant_id', $klantId) }}"
+                        placeholder="Bijv. 3"
+                        required
+                    >
+                    <div class="invalid-feedback">Klant ID is verplicht.</div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                    <label for="beschrijving" class="form-label">Nieuwe allergie</label>
+                    <input
+                        id="beschrijving"
+                        name="beschrijving"
+                        type="text"
+                        class="form-control"
+                        maxlength="100"
+                        pattern="[A-Za-z0-9 .,'()\-]*"
+                        value="{{ old('beschrijving') }}"
+                        placeholder="Bijv. Noten"
+                        required
+                    >
+                    <div class="invalid-feedback">Vul een geldige beschrijving in.</div>
+                </div>
+
+                <div class="col-12 col-lg-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Toevoegen</button>
+                </div>
+            </form>
+
             <form method="GET" action="{{ route('allergieen.index') }}" class="row g-3 needs-validation" novalidate>
                 <div class="col-12 col-md-3">
                     <label for="klant_id" class="form-label">Klant ID</label>
@@ -34,16 +73,16 @@
                 </div>
 
                 <div class="col-12 col-md-4">
-                    <label for="zoekterm" class="form-label">Beschrijving</label>
+                    <label for="zoekterm" class="form-label">Beschrijving / Gezinsnaam</label>
                     <input
                         id="zoekterm"
                         name="zoekterm"
                         type="text"
                         class="form-control"
                         maxlength="100"
-                        pattern="[A-Za-z0-9 .,'()\\-]*"
+                        pattern="[A-Za-z0-9 .,'()\-]*"
                         value="{{ $zoekterm }}"
-                        placeholder="Zoek op allergie of gezinsnaam"
+                        placeholder="Zoekterm"
                     >
                     <div class="invalid-feedback">Gebruik alleen letters, cijfers en standaard leestekens.</div>
                 </div>
@@ -64,7 +103,7 @@
                 </div>
 
                 <div class="col-12 col-md-3 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-success">Toon</button>
+                    <button type="submit" class="btn btn-success">Filter</button>
                     <a href="{{ route('allergieen.index') }}" class="btn btn-outline-secondary">Reset</a>
                 </div>
             </form>
@@ -114,7 +153,7 @@
                         @else
                             @foreach ($allergieen as $allergie)
                                 <tr>
-                                    <td>{{ (int) ($allergie->klant_id ?? 0) }}</td>
+                                    <td>{{ isset($allergie->klant_id) ? (int) $allergie->klant_id : '-' }}</td>
                                     <td>{{ $allergie->gezinsnaam ?? '-' }}</td>
                                     <td>{{ (int) $allergie->allergie_id }}</td>
                                     <td>{{ $allergie->allergie_beschrijving }}</td>
