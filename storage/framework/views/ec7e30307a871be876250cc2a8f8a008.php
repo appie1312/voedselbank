@@ -34,6 +34,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="<?php echo e(route('klanten.index')); ?>">Klanten</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo e(route('allergieen.index')); ?>">Allergieen</a>
+                        </li>
                     <?php endif; ?>
 
                     <li class="nav-item ms-lg-2">

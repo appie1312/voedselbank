@@ -21,15 +21,6 @@ class VoorraadController extends Controller
         'Schap 2',
     ];
 
-    private const VOORRAAD_LOCATIES = [
-        'Magazijn A',
-        'Magazijn B',
-        'Koeling',
-        'Vriezer',
-        'Schap 1',
-        'Schap 2',
-    ];
-
     public function __construct()
     {
         $this->voorraadModel = new VoorraadModel(DB::connection()->getPdo());
@@ -139,6 +130,27 @@ class VoorraadController extends Controller
             'minimum_voorraad' => ['required', 'integer', 'min:0'],
             'locatie' => ['nullable', 'string', 'max:100', Rule::in(self::VOORRAAD_LOCATIES)],
         ]);
+
+        $voorraadItem = $this->voorraadModel->getVoorraadRegelByProductId($productId);
+
+        if (! $voorraadItem) {
+            return redirect()
+                ->route('voorraad')
+                ->with('error', 'Voorraadregel is niet gevonden.');
+        }
+
+        $nieuweLocatie = $data['locatie'] ?? null;
+        $huidigeLocatie = $voorraadItem->locatie ?? null;
+
+        if (
+            (int) $voorraadItem->hoeveelheid === (int) $data['hoeveelheid']
+            && (int) $voorraadItem->minimum_voorraad === (int) $data['minimum_voorraad']
+            && $huidigeLocatie === $nieuweLocatie
+        ) {
+            return redirect()
+                ->route('voorraad')
+                ->with('error', 'Je hebt ' . $voorraadItem->product_naam . ' niet gewijzigd.');
+        }
 
         $gewijzigd = $this->voorraadModel->updateVoorraadRegel(
             $productId,
