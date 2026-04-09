@@ -14,10 +14,13 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Basisdata eerst, daarna afgeleide data die daarvan afhankelijk is.
         $this->call(LeverancierSeeder::class);
         $this->call(CoreBusinessSeeder::class);
+        $this->call(KlantenSeeder::class);
         $this->call(ProductsSeeder::class);
         $this->call(VoorraadSeeder::class);
+        $this->call(VoedselpakketSeeder::class);
 
         $gebruikers = [
             [
@@ -68,3 +71,4 @@ class DatabaseSeeder extends Seeder
         }
     }
 }
+
