@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\LeverancierController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KlantenController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VoorraadController;
 use Illuminate\Support\Facades\Route;
@@ -29,13 +31,18 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('role:directie')->group(function (): void {
         Route::get('/directie/dashboard', [DashboardController::class, 'directie'])->name('directie.dashboard');
         Route::get('/directie/accounts', [AccountController::class, 'index'])->name('accounts.index');
+        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });
 
     Route::middleware('role:magazijn_medewerker')->group(function (): void {
         Route::get('/magazijn/dashboard', [DashboardController::class, 'magazijn'])->name('magazijn.dashboard');
+        Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
     });
 
     Route::middleware('role:vrijwilliger')->group(function (): void {
+                Route::get('/leveranciers', [LeverancierController::class, 'index'])->name('leveranciers.index');
+        // Route::post('/leveranciers', [LeverancierController::class, 'store'])->name('leveranciers.store');
+
         Route::get('/vrijwilliger/dashboard', [DashboardController::class, 'vrijwilliger'])->name('vrijwilliger.dashboard');
     });
 });

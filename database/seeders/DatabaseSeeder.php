@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+         $this->call(LeverancierSeeder::class);
+        $this->call(CoreBusinessSeeder::class);
         DB::table('voorraden')->delete();
         DB::table('products')->delete();
         DB::table('categories')->delete();

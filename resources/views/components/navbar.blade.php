@@ -20,6 +20,9 @@
 
                 @auth
                     <li class="nav-item">
+                        <a class="nav-link" href="{{ route('leveranciers.index') }}">Leveranciers</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard.redirect') }}">Dashboard</a>
                     </li>
                     <li class="nav-item">
@@ -28,7 +31,7 @@
 
                     @if (auth()->user()->isDirectie())
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('accounts.index') }}">Accounts</a>
+                            <a class="nav-link" href="{{ route('klanten.index') }}">Klanten</a>
                         </li>
                     @endif
 
