@@ -11,7 +11,7 @@
     @php $canManageVoorraad = in_array(auth()->user()->role ?? null, ['directie', 'magazijn_medewerker'], true); @endphp
 
     @if (session('success'))
-        <div class="alert alert-success" role="alert">
+        <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="3000">
             {{ session('success') }}
         </div>
     @endif
