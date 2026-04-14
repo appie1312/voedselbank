@@ -11,7 +11,6 @@
     <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
             <h1 class="h4 mb-0">{{ $isEdit ? 'Leverancier wijzigen' : 'Nieuwe leverancier' }}</h1>
-            <a href="{{ route('leveranciers.index') }}" class="btn btn-outline-secondary">Terug naar overzicht</a>
         </div>
 
         @if($errors->has('bedrijfsnaam'))
@@ -78,7 +77,7 @@
             </div>
 
             <div class="col-12 d-flex gap-2">
-                <button type="submit" class="btn btn-success">OK</button>
+                <button type="submit" class="btn btn-success">{{ $isEdit ? 'Wijzigen' : 'OK' }}</button>
                 <a href="{{ route('leveranciers.index') }}" class="btn btn-outline-secondary">Annuleren</a>
             </div>
         </form>
