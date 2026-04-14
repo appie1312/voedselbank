@@ -1,7 +1,10 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 79e8112140206df45210b8f498e456509e0c1ad4
+=======
+>>>>>>> ea06c036c22e6b68d6c8237e3e02a619a890e375
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
@@ -61,9 +64,15 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> ea06c036c22e6b68d6c8237e3e02a619a890e375
 =======
 # voedselbank
 proefexamen
 >>>>>>> a90d9a97291ec300d92cfe8c515e9ee49bb511b1
+<<<<<<< HEAD
 >>>>>>> 79e8112140206df45210b8f498e456509e0c1ad4
+=======
+>>>>>>> ea06c036c22e6b68d6c8237e3e02a619a890e375
