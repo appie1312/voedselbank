@@ -1,6 +1,6 @@
 use voedselbank_maaskantje;
 DELIMITER $$
-
+-- wordt gebruikt met tabel leveriers
 DROP PROCEDURE IF EXISTS sp_get_all_leveranciers $$
 CREATE PROCEDURE sp_get_all_leveranciers()
 BEGIN

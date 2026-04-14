@@ -7,6 +7,8 @@
         // We gebruiken request() om errors te voorkomen als er niet gefilterd wordt
         $zoekterm = request('zoekterm', '');
         $aantalRijen = (int) request('aantal_rijen', 5);
+        $geselecteerdeEetwens = $geselecteerdeEetwens ?? request('eetwens', '');
+        $eetwensen = $eetwensen ?? collect();
         $vasteRijen = 5;
         // Zorg dat we niet onder de 0 uitkomen met lege rijen
         $legeRijen = max(0, $vasteRijen - (isset($pakketten) ? $pakketten->count() : 0));
@@ -50,8 +52,20 @@
                     <div class="invalid-feedback">Vul een getal tussen 1 en 25 in.</div>
                 </div>
 
-                <div class="col-12 col-md-8 col-lg-3 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary">Filteren</button>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <label for="eetwens" class="form-label">Eetwensen</label>
+                    <select id="eetwens" name="eetwens" class="form-select">
+                        <option value="">Alle eetwensen</option>
+                        @foreach ($eetwensen as $optieEetwens)
+                            <option value="{{ $optieEetwens }}" @selected($geselecteerdeEetwens === $optieEetwens)>
+                                {{ $optieEetwens }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary">Toon Gezinnen</button>
                     <a href="{{ route(auth()->user()->role . '.voedselpakketten.index') }}" class="btn btn-outline-secondary">Reset</a>
                 </div>
             </form>
@@ -84,7 +98,7 @@
                             @endfor
                         @elseif (!isset($pakketten) || $pakketten->isEmpty())
                             <tr>
-                                <td colspan="6" class="text-center">Er zijn geen voedselpakketten gevonden.</td>
+                                <td colspan="6" class="text-center">{{ $geenResultatenMelding ?? 'Er zijn geen voedselpakketten gevonden.' }}</td>
                             </tr>
                             @for ($index = 0; $index < $vasteRijen - 1; $index++)
                                 <tr class="table-light">

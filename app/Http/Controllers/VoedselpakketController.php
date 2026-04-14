@@ -18,10 +18,16 @@ class VoedselpakketController extends Controller
     public function index(Request $request): View
     {
         $zoekterm = (string) $request->input('zoekterm', '');
+        $eetwens = (string) $request->input('eetwens', '');
         $aantalRijen = (int) $request->input('aantal_rijen', 5);
+        $eetwensen = collect();
 
         try {
-            $pakketten = Voedselpakket::haalOverzichtViaStoredProcedure($zoekterm, $aantalRijen);
+            $eetwensen = DB::table('wens_allergies')
+                ->orderBy('beschrijving')
+                ->pluck('beschrijving');
+
+            $pakketten = Voedselpakket::haalOverzichtViaStoredProcedure($zoekterm, $aantalRijen, $eetwens);
             $pakketten = $this->vulInhoudAan($pakketten);
         } catch (Throwable $exception) {
             Log::error('Technische log: voedselpakkettenoverzicht laden mislukt.', [
@@ -32,11 +38,25 @@ class VoedselpakketController extends Controller
 
             return view('voedselpakketten.index', [
                 'pakketten' => collect(),
+                'eetwensen' => collect(),
+                'geselecteerdeEetwens' => trim($eetwens),
                 'status_error' => 'Het overzicht kon niet worden geladen. Vernieuw de pagina of probeer het later opnieuw.',
             ]);
         }
 
-        return view('voedselpakketten.index', ['pakketten' => $pakketten]);
+        $geselecteerdeEetwens = trim($eetwens);
+        $geenResultatenMelding = null;
+
+        if ($geselecteerdeEetwens !== '' && $pakketten->isEmpty()) {
+            $geenResultatenMelding = 'Er zijn geen gezinnen bekent die de geselecteerde eetwens hebben';
+        }
+
+        return view('voedselpakketten.index', [
+            'pakketten' => $pakketten,
+            'eetwensen' => $eetwensen,
+            'geselecteerdeEetwens' => $geselecteerdeEetwens,
+            'geenResultatenMelding' => $geenResultatenMelding,
+        ]);
     }
 
     public function create(): View|RedirectResponse
@@ -107,8 +127,6 @@ class VoedselpakketController extends Controller
                 return redirect()->route($this->roleRoute('index'))
                     ->with('status_error', 'Pakket #' . $id . ' bestaat niet (meer).');
             }
-
-            $klanten = Klant::orderBy('gezinsnaam')->get();
         } catch (Throwable $exception) {
             Log::error('Technische log: voedselpakket wijzigen-form laden mislukt.', [
                 'user_id' => auth()->id(),
@@ -121,20 +139,27 @@ class VoedselpakketController extends Controller
                 ->with('status_error', 'Er is een storing. Het wijzigformulier kon niet worden geladen.');
         }
 
-        return view('voedselpakketten.edit', compact('pakket', 'klanten'));
+        $statusWijzigingGeblokkeerd = ($pakket->aanwezigheidsstatus ?? 'binnen_land') !== 'binnen_land';
+        $statusNietMogelijkMelding = 'Dit gezin is niet meer ingeschreven bij de voedselbank en daarom kan er geen voedselpakket worden uitgereikt';
+
+        return view('voedselpakketten.edit', compact(
+            'pakket',
+            'statusWijzigingGeblokkeerd',
+            'statusNietMogelijkMelding'
+        ));
     }
 
     public function update(Request $request, int $id): RedirectResponse
     {
         $request->validate([
-            'klant_id' => 'required|exists:klanten,id',
-            'opgehaald' => 'nullable|boolean',
+            'status' => 'required|in:Uitgereikt,Niet Uitgereikt',
         ]);
 
         try {
-            $pakket = DB::table('voedselpakketten')
-                ->where('id', $id)
-                ->select(['id', 'datum_uitgifte'])
+            $pakket = DB::table('voedselpakketten as vp')
+                ->join('klanten as k', 'k.id', '=', 'vp.klant_id')
+                ->where('vp.id', $id)
+                ->select(['vp.id', 'vp.klant_id', 'vp.datum_uitgifte', 'k.aanwezigheidsstatus'])
                 ->first();
 
             if (! $pakket) {
@@ -142,7 +167,14 @@ class VoedselpakketController extends Controller
                     ->with('status_error', 'Pakket #' . $id . ' bestaat niet (meer).');
             }
 
-            if (! is_null($pakket->datum_uitgifte) && ! $request->boolean('opgehaald')) {
+            if (($pakket->aanwezigheidsstatus ?? 'binnen_land') !== 'binnen_land') {
+                return redirect()->route($this->roleRoute('edit'), ['id' => $id])
+                    ->with('status_error', 'Dit gezin is niet meer ingeschreven bij de voedselbank en daarom kan er geen voedselpakket worden uitgereikt');
+            }
+
+            $opgehaald = $request->input('status') === 'Uitgereikt';
+
+            if (! is_null($pakket->datum_uitgifte) && ! $opgehaald) {
                 // Een afgehandeld pakket mag niet terug naar "niet opgehaald".
                 return back()
                     ->withInput()
@@ -150,8 +182,8 @@ class VoedselpakketController extends Controller
             }
 
             $gewijzigd = Voedselpakket::wijzigViaQuery($id, [
-                'klant_id' => (int) $request->klant_id,
-                'opgehaald' => $request->boolean('opgehaald'),
+                'klant_id' => (int) $pakket->klant_id,
+                'opgehaald' => $opgehaald,
             ]);
 
             if (! $gewijzigd) {
@@ -171,8 +203,10 @@ class VoedselpakketController extends Controller
                 ->with('status_error', 'Het voedselpakket kon niet worden gewijzigd.');
         }
 
-        return redirect()->route($this->roleRoute('index'))
-            ->with('status_success', 'Het voedselpakket is bijgewerkt.');
+        return redirect()->route($this->roleRoute('edit'), ['id' => $id])
+            ->with('status_success', 'De wijziging is doorgevoerd')
+            ->with('status_success_timeout', 3000)
+            ->with('status_success_redirect', route($this->roleRoute('index')));
     }
 
     public function destroy(Request $request, int $id): RedirectResponse
@@ -417,4 +451,3 @@ class VoedselpakketController extends Controller
         });
     }
 }
-

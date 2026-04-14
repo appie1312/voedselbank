@@ -41,23 +41,29 @@ class Voedselpakket extends Model
                     ->withPivot('aantal');
     }
 
-    public static function haalOverzichtViaStoredProcedure(?string $zoekterm, int $aantalRijen): Collection
+    public static function haalOverzichtViaStoredProcedure(?string $zoekterm, int $aantalRijen, ?string $eetwens = null): Collection
     {
         $veiligeZoekterm = trim((string) $zoekterm);
+        $veiligeEetwens = trim((string) $eetwens);
         $begrensdAantalRijen = min(max($aantalRijen, 1), 25);
 
         try {
-            $resultaten = DB::select('CALL sp_voedselpakketten_overzicht(?, ?)', [
+            $resultaten = DB::select('CALL sp_voedselpakketten_overzicht(?, ?, ?)', [
                 $veiligeZoekterm === '' ? null : $veiligeZoekterm,
                 $begrensdAantalRijen,
+                $veiligeEetwens === '' ? null : $veiligeEetwens,
             ]);
         } catch (QueryException $exception) {
-            if (! str_contains(strtolower($exception->getMessage()), 'sp_voedselpakketten_overzicht')) {
+            $message = strtolower($exception->getMessage());
+            $sqliteFallback = DB::getDriverName() !== 'mysql' && str_contains($message, 'call');
+            $procedureNietBeschikbaar = str_contains($message, 'sp_voedselpakketten_overzicht');
+
+            if (! $sqliteFallback && ! $procedureNietBeschikbaar) {
                 throw $exception;
             }
 
             // Fallback voor omgevingen zonder SP.
-            return self::haalOverzichtViaJoinQuery($veiligeZoekterm, $begrensdAantalRijen);
+            return self::haalOverzichtViaJoinQuery($veiligeZoekterm, $begrensdAantalRijen, $veiligeEetwens);
         }
 
         return collect($resultaten);
@@ -74,6 +80,7 @@ class Voedselpakket extends Model
                 'vp.datum_samenstelling',
                 'vp.datum_uitgifte',
                 'k.gezinsnaam',
+                'k.aanwezigheidsstatus',
             ])
             ->first();
     }
@@ -128,10 +135,16 @@ class Voedselpakket extends Model
         return true;
     }
 
-    private static function haalOverzichtViaJoinQuery(string $zoekterm, int $aantalRijen): Collection
+    private static function haalOverzichtViaJoinQuery(string $zoekterm, int $aantalRijen, string $eetwens): Collection
     {
         return DB::table('voedselpakketten as vp')
             ->join('klanten as k', 'k.id', '=', 'vp.klant_id')
+            ->when($eetwens !== '', function ($query) use ($eetwens): void {
+                $query
+                    ->join('klant_wens as kw', 'kw.klant_id', '=', 'k.id')
+                    ->join('wens_allergies as wa', 'wa.id', '=', 'kw.wens_id')
+                    ->where('wa.beschrijving', $eetwens);
+            })
             ->when($zoekterm !== '', function ($query) use ($zoekterm): void {
                 $query->where(function ($subQuery) use ($zoekterm): void {
                     $subQuery->where('k.gezinsnaam', 'like', '%' . $zoekterm . '%');
@@ -151,6 +164,7 @@ class Voedselpakket extends Model
                 'vp.datum_samenstelling',
                 'vp.datum_uitgifte',
             ])
+            ->distinct()
             ->get();
     }
 }

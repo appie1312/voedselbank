@@ -1,12 +1,22 @@
 @if (session('status_success'))
-    <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="5000">
+    @php $statusSuccessTimeout = (int) session('status_success_timeout', 5000); @endphp
+    <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="{{ $statusSuccessTimeout }}">
         {{ session('status_success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    @if (session('status_success_redirect'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                window.setTimeout(function () {
+                    window.location.href = @json(session('status_success_redirect'));
+                }, {{ $statusSuccessTimeout }});
+            });
+        </script>
+    @endif
 @endif
 
 @if (isset($status_success))
-    <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="5000">
+    <div class="alert alert-success alert-dismissible fade show flash-auto" role="alert" data-auto-dismiss="{{ (int) ($status_success_timeout ?? 5000) }}">
         {{ $status_success }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -20,7 +30,7 @@
     <div class="alert alert-danger" role="alert">{{ $status_error }}</div>
 @endif
 
-@if ($errors->any())
+@if ($errors->any() && ! $__env->hasSection('suppress_global_validation_errors'))
     <div class="alert alert-danger" role="alert">
         <strong>Controleer je invoer:</strong>
         <ul class="mb-0 mt-2">

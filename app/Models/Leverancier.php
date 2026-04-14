@@ -21,7 +21,7 @@ class Leverancier extends Model
         try {
             $leveranciers = collect(DB::select('CALL sp_get_all_leveranciers()'));
         } catch (QueryException $exception) {
-            // Fallback wanneer de stored procedure (nog) niet bestaat.
+            //wanneer de stored procedure (nog) niet bestaat.
             $leveranciers = DB::table('leveranciers')->orderBy('bedrijfsnaam')->get();
         }
 
