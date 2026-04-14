@@ -2,7 +2,7 @@
 -- VOEDSELBANK MAASKANTJE - TEAM MYSQL SCRIPT
 -- ==========================================
 
-DROP DATABASE IF EXISTS voedselbank_maaskantje;
+DROP DATABASE IF EXISTS voedselbankMaaskantje;
 CREATE DATABASE voedselbank_maaskantje
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;

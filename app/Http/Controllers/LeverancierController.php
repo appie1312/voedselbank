@@ -17,6 +17,7 @@ class LeverancierController extends Controller
 {
     public function index(): View
     {
+        // Haal alle leveranciers op, inclusief gekoppelde producten.
         $leveranciers = Leverancier::getAllMetProducten();
 
         return view('leveranciers.index', compact('leveranciers'));
@@ -37,6 +38,7 @@ class LeverancierController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Basis validatie voor leverancier + optionele productkoppeling.
         $data = $request->validate([
             'bedrijfsnaam' => ['required', 'string', 'max:150', Rule::unique('leveranciers', 'bedrijfsnaam')],
             'adres' => ['required', 'string', 'max:255'],
@@ -61,6 +63,7 @@ class LeverancierController extends Controller
 
         $productIds = $data['product_ids'] ?? [];
 
+        // Koppel geselecteerde producten via pivot-tabel als die bestaat.
         if (Schema::hasTable('leverancier_products') && ! empty($productIds)) {
             $now = now();
 
@@ -135,6 +138,7 @@ class LeverancierController extends Controller
 
         $isGewijzigd = false;
 
+        // Controleer eerst of leveranciergegevens echt gewijzigd zijn.
         foreach ($veldWijzigingen as $veld => $waarde) {
             $huidigeWaarde = $leverancier->{$veld};
 
@@ -179,6 +183,7 @@ class LeverancierController extends Controller
 
         $leverancier->update($veldWijzigingen);
 
+        // Vervang productkoppelingen volledig met de nieuwe selectie.
         if (Schema::hasTable('leverancier_products')) {
             DB::table('leverancier_products')->where('leverancier_id', $leverancier->id)->delete();
 
@@ -208,6 +213,7 @@ class LeverancierController extends Controller
                 ->with('error', 'leverancier is al verwijder en kan daarom niet verwijderd worden');
         }
 
+        // Soft/hard delete volgens model-instelling.
         $leverancier->delete();
 
         return redirect()

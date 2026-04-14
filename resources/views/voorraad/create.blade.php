@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('suppress_global_validation_errors', '1')
+
 @section('content')
 <div class="container mt-4">
     <div class="card shadow-sm border-0">

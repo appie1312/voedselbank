@@ -30,7 +30,7 @@
     <div class="alert alert-danger" role="alert">{{ $status_error }}</div>
 @endif
 
-@if ($errors->any())
+@if ($errors->any() && ! $__env->hasSection('suppress_global_validation_errors'))
     <div class="alert alert-danger" role="alert">
         <strong>Controleer je invoer:</strong>
         <ul class="mb-0 mt-2">

@@ -7,8 +7,10 @@ use Exception;
 
 class VoorraadModel
 {
+    // Database connectie opslaan in een private property
     private PDO $db;
 
+    // Constructor: krijgt PDO connectie mee vanuit controller
     public function __construct(PDO $dbConnection)
     {
         $this->db = $dbConnection;
@@ -22,6 +24,8 @@ class VoorraadModel
     public function getVoorraadLijst()
     {
         try {
+            // Query om alle voorraadregels op te halen
+            // inclusief productnaam, categorie, hoeveelheid, minimum voorraad, locatie en status
             $query = "
                 SELECT
                     p.id AS product_id,
@@ -40,16 +44,21 @@ class VoorraadModel
                 INNER JOIN categories c ON p.categorie_id = c.id
                 ORDER BY p.productnaam ASC
             ";
+
+            // Query voorbereiden en uitvoeren
             $stmt = $this->db->prepare($query);
             $stmt->execute();
 
+            // Alle resultaten ophalen als objecten
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (Exception $e) {
+            // Fout loggen en false teruggeven
             error_log("Fout in VoorraadModel::getVoorraadLijst: " . $e->getMessage());
             return false;
         }
     }
 
+    // Haalt alle producten op die nog niet in de voorraad staan
     public function getProductenNietInVoorraad(): array
     {
         try {
@@ -66,11 +75,13 @@ class VoorraadModel
 
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (Exception $e) {
+            // Bij fout lege array teruggeven
             error_log("Fout in VoorraadModel::getProductenNietInVoorraad: " . $e->getMessage());
             return [];
         }
     }
 
+    // Voegt een product toe aan de voorraad
     public function addProductAanVoorraad(int $productId, int $hoeveelheid, int $minimumVoorraad, ?string $locatie): bool
     {
         try {
@@ -81,6 +92,7 @@ class VoorraadModel
 
             $stmt = $this->db->prepare($query);
 
+            // Execute geeft true of false terug
             return $stmt->execute([
                 ':product_id' => $productId,
                 ':hoeveelheid' => $hoeveelheid,
@@ -93,6 +105,7 @@ class VoorraadModel
         }
     }
 
+    // Zoekt een product op naam dat nog niet in voorraad zit
     public function findBeschikbaarProductByNaam(string $productNaam): object|null
     {
         try {
@@ -112,6 +125,7 @@ class VoorraadModel
 
             $result = $stmt->fetch(PDO::FETCH_OBJ);
 
+            // Als geen resultaat, dan null teruggeven
             return $result ?: null;
         } catch (Exception $e) {
             error_log("Fout in VoorraadModel::findBeschikbaarProductByNaam: " . $e->getMessage());
@@ -119,6 +133,7 @@ class VoorraadModel
         }
     }
 
+    // Zoekt een product op naam, ongeacht of het al in voorraad zit
     public function findProductByNaam(string $productNaam): object|null
     {
         try {
@@ -143,6 +158,7 @@ class VoorraadModel
         }
     }
 
+    // Controleert of een product al in de voorraad staat
     public function staatProductAlInVoorraad(int $productId): bool
     {
         try {
@@ -152,6 +168,7 @@ class VoorraadModel
                 ':product_id' => $productId,
             ]);
 
+            // Als count groter is dan 0, bestaat het product al in voorraad
             return (int) $stmt->fetchColumn() > 0;
         } catch (Exception $e) {
             error_log("Fout in VoorraadModel::staatProductAlInVoorraad: " . $e->getMessage());
@@ -159,9 +176,11 @@ class VoorraadModel
         }
     }
 
+    // Maakt een nieuw product aan in de products tabel
     public function maakProductAan(string $productNaam): object|null
     {
         try {
+            // Haal standaard categorie op
             $categorieId = $this->getStandaardCategorieId();
 
             if ($categorieId === null) {
@@ -180,8 +199,10 @@ class VoorraadModel
                 ':categorie_id' => $categorieId,
             ]);
 
+            // ID van nieuw product ophalen
             $productId = (int) $this->db->lastInsertId();
 
+            // Zelf een object teruggeven
             return (object) [
                 'id' => $productId,
                 'productnaam' => trim($productNaam),
@@ -192,6 +213,7 @@ class VoorraadModel
         }
     }
 
+    // Werkt een bestaande voorraadregel bij
     public function updateVoorraadRegel(int $productId, int $hoeveelheid, int $minimumVoorraad, ?string $locatie): bool
     {
         try {
@@ -218,6 +240,7 @@ class VoorraadModel
         }
     }
 
+    // Haalt één voorraadregel op via product ID
     public function getVoorraadRegelByProductId(int $productId): object|null
     {
         try {
@@ -250,6 +273,7 @@ class VoorraadModel
         }
     }
 
+    // Verwijdert een voorraadregel op basis van product ID
     public function deleteVoorraadRegel(int $productId): bool
     {
         try {
@@ -259,6 +283,7 @@ class VoorraadModel
                 ':product_id' => $productId,
             ]);
 
+            // rowCount controleert of er echt iets verwijderd is
             return $stmt->rowCount() > 0;
         } catch (Exception $e) {
             error_log("Fout in VoorraadModel::deleteVoorraadRegel: " . $e->getMessage());
@@ -266,6 +291,7 @@ class VoorraadModel
         }
     }
 
+    // Haalt standaard categorie ID op, of maakt categorie "Overig" aan als die niet bestaat
     private function getStandaardCategorieId(): int|null
     {
         try {
@@ -274,10 +300,12 @@ class VoorraadModel
             $stmt->execute();
             $categoryId = $stmt->fetchColumn();
 
+            // Als er al een categorie bestaat, gebruik die
             if ($categoryId !== false) {
                 return (int) $categoryId;
             }
 
+            // Anders maak categorie "Overig" aan
             $insert = "INSERT INTO categories (naam, created_at, updated_at) VALUES ('Overig', NOW(), NOW())";
             $this->db->exec($insert);
 
@@ -288,8 +316,10 @@ class VoorraadModel
         }
     }
 
+    // Genereert een uniek 13-cijferig EAN nummer
     private function genereerUniekEanNummer(): string
     {
+        // Maximaal 25 pogingen om een uniek nummer te maken
         for ($i = 0; $i < 25; $i++) {
             $ean = str_pad((string) random_int(0, 9999999999999), 13, '0', STR_PAD_LEFT);
 
@@ -299,11 +329,13 @@ class VoorraadModel
                 ':ean_nummer' => $ean,
             ]);
 
+            // Als het nummer nog niet bestaat, gebruik deze
             if ((int) $stmt->fetchColumn() === 0) {
                 return $ean;
             }
         }
 
+        // Fallback als het na 25 keer niet lukt
         return str_pad((string) time(), 13, '0', STR_PAD_LEFT);
     }
 }
