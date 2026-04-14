@@ -20,7 +20,7 @@ class KlantToevoegenRequest extends FormRequest
             'gezinsnaam' => ['required', 'string', 'max:100', 'regex:/^[\pL\pN\s\.\,\-\'\(\)]*$/u'],
             'adres' => ['required', 'string', 'max:255'],
             'telefoonnummer' => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]*$/'],
-            'emailadres' => ['nullable', 'email:rfc,dns', 'max:150'],
+            'emailadres' => ['nullable', 'email:rfc', 'max:150'],
             'aanwezigheidsstatus' => ['required', 'in:binnen_land,buiten_land,afwezig'],
             'aantal_volwassenen' => ['required', 'integer', 'min:0', 'max:20'],
             'aantal_kinderen' => ['required', 'integer', 'min:0', 'max:20'],
@@ -53,11 +53,13 @@ class KlantToevoegenRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $emailadres = trim((string) $this->input('emailadres'));
+
         $this->merge([
             'gezinsnaam' => trim((string) $this->input('gezinsnaam')),
             'adres' => trim((string) $this->input('adres')),
             'telefoonnummer' => trim((string) $this->input('telefoonnummer')),
-            'emailadres' => trim((string) $this->input('emailadres')),
+            'emailadres' => $emailadres === '' ? null : $emailadres,
             'aanwezigheidsstatus' => trim((string) $this->input('aanwezigheidsstatus')),
         ]);
     }
